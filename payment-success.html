@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Sanherbs</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 20px;
+            animation: checkmark 0.6s ease-in-out;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-title {
+            color: #2c5f2d;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .order-details {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">🌿 Sanherbs</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="/marketplace" class="nav-link"><i class="fas fa-store"></i> Products</a>
+                <a href="/cart" class="nav-link cart-link"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-badge">0</span></a>
+                <a href="/orders" class="nav-link"><i class="fas fa-box"></i> Orders</a>
+                <a href="/order-tracking" class="nav-link"><i class="fas fa-truck"></i> Track</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-primary">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="success-container">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h1 class="success-title">Payment Successful!</h1>
+            <p>Thank you for your order. Your payment has been processed successfully.</p>
+            
+            <div class="order-details" id="orderDetails">
+                <h3><i class="fas fa-receipt"></i> Order Details</h3>
+                <div id="orderInfo">
+                    <p><strong>Order ID:</strong> <span id="orderIdDisplay">Loading...</span></p>
+                    <p><strong>Amount Paid:</strong> ₹<span id="amountDisplay">0</span></p>
+                    <p><strong>Payment Method:</strong> Online Payment</p>
+                    <p><strong>Status:</strong> <span class="text-success">Confirmed</span></p>
+                </div>
+            </div>
+            
+            <div class="info-text">
+                <p><i class="fas fa-email"></i> Order confirmation sent to your email</p>
+                <p><i class="fas fa-truck"></i> Your order will be processed within 24 hours</p>
+                <p><i class="fas fa-headset"></i> Need help? Contact our support team</p>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="/orders" class="btn btn-primary">
+                    <i class="fas fa-box"></i> View My Orders
+                </a>
+                <a href="/order-tracking" class="btn btn-outline">
+                    <i class="fas fa-truck"></i> Track Order
+                </a>
+                <a href="/marketplace" class="btn btn-secondary">
+                    <i class="fas fa-store"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sanherbs. Premium Health Supplements.</p>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script>
+        // Get order details from URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            const amount = urlParams.get('amount');
+            
+            if (orderId) {
+                document.getElementById('orderIdDisplay').textContent = orderId;
+            }
+            if (amount) {
+                document.getElementById('amountDisplay').textContent = amount;
+            }
+            
+            // Clear cart after successful payment
+            localStorage.removeItem('greentap_cart');
+            
+            // Update cart badge
+            const cartBadge = document.querySelector('.cart-badge');
+            if (cartBadge) {
+                cartBadge.textContent = '0';
+                cartBadge.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

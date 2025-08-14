@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout - GreenTap Health</title>
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        /* Additional checkout-specific styles */
+        .checkout-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+        
+        .checkout-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .checkout-form h2 {
+            color: #2c5f2d;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e8f5e8;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section h3 {
+            color: #2c5f2d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .payment-methods {
+            margin-bottom: 1.5rem;
+        }
+        
+        .payment-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option.selected {
+            border-color: #4caf50;
+            background: #f8fff8;
+        }
+        
+        .payment-option input[type="radio"] {
+            margin-right: 1rem;
+        }
+        
+        .payment-option label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .payment-option strong {
+            color: #2c5f2d;
+        }
+        
+        .payment-option small {
+            color: #666;
+            display: block;
+            margin-top: 0.3rem;
+        }
+        
+        .payment-method-info {
+            background: #f8fff8;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .payment-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .payment-option-badge {
+            background: #e8f5e8;
+            color: #2c5f2d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .security-badge {
+            text-align: center;
+            color: #4caf50;
+            font-size: 0.85rem;
+        }
+        
+        .security-badge i {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        #placeOrderBtn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        #placeOrderBtn:hover {
+            background: linear-gradient(135deg, #388e3c, #4caf50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .order-summary {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .loading i {
+            color: #4caf50;
+            margin-right: 0.5rem;
+        }
+        
+        #checkoutError {
+            background: #ffe6e6;
+            border: 1px solid #ff4444;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            color: #cc0000;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 1rem auto;
+            }
+            
+            .order-summary {
+                position: static;
+                order: -1;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-form {
+                padding: 1.5rem;
+            }
+            
+            .security-badges {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-leaf"></i> GreenTap Health</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Products</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+                </a></li>
+                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Checkout Header -->
+    <section class="checkout-header">
+        <div class="container">
+            <h1><i class="fas fa-credit-card"></i> Secure Checkout</h1>
+            <p>Complete your order with our secure payment system</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="checkout-container">
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+            <h2><i class="fas fa-lock"></i> Secure Payment</h2>
+            
+            <!-- Error Display -->
+            <div id="checkoutError" style="display: none;"></div>
+            
+            <form id="checkoutForm">
+                <!-- Customer Details -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Customer Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerName">Full Name *</label>
+                            <input type="text" id="customerName" name="customerName" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address *</label>
+                            <input type="email" id="customerEmail" name="customerEmail" required placeholder="your@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" required maxlength="10" placeholder="10-digit mobile number">
+                    </div>
+                </div>
+
+                <!-- Delivery Address -->
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Delivery Address</h3>
+                    
+                    <div class="form-group">
+                        <label for="address">Complete Address *</label>
+                        <textarea id="address" name="address" required rows="3" placeholder="House/Flat No, Building, Street, Area"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" required placeholder="Your city" value="Pune">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <select id="state" name="state" required>
+                                <option value="">Select State</option>
+                                <option value="Maharashtra" selected>Maharashtra</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pincode">PIN Code *</label>
+                        <input type="text" id="pincode" name="pincode" required maxlength="6" pattern="[0-9]{6}" placeholder="6-digit PIN code">
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-section">
+                    <h3><i class="fas fa-credit-card"></i> Payment Method</h3>
+                    
+                    <div class="payment-methods">
+                        <!-- Only Online Payment Option -->
+                        <div class="payment-option selected">
+                            <input type="radio" id="razorpay" name="paymentMethod" value="razorpay" checked>
+                            <label for="razorpay">
+                                <i class="fas fa-credit-card" style="color: #4caf50; font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong>Secure Online Payment</strong>
+                                    <small>Cards, UPI, Net Banking, Wallets</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Method Details -->
+                    <div id="paymentMethodDetails">
+                        <div class="payment-method-info">
+                            <h4>💳 Secure Online Payment via Razorpay</h4>
+                            <p>Pay safely using India's most trusted payment gateway with industry-standard security</p>
+                            <div class="payment-options">
+                                <span class="payment-option-badge">💳 Credit/Debit Cards</span>
+                                <span class="payment-option-badge">🏦 Net Banking</span>
+                                <span class="payment-option-badge">📱 UPI</span>
+                                <span class="payment-option-badge">💰 Digital Wallets</span>
+                                <span class="payment-option-badge">💸 EMI Options</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Badges -->
+                    <div class="security-badges">
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>SSL Secured</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-lock"></i>
+                            <span>256-bit Encryption</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>PCI DSS Compliant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Notes -->
+                <div class="form-section">
+                    <h3><i class="fas fa-sticky-note"></i> Order Notes (Optional)</h3>
+                    <div class="form-group">
+                        <label for="notes">Special Instructions</label>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Any special delivery instructions or health conditions we should know about..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Place Order Button -->
+                <button type="submit" id="placeOrderBtn" class="btn btn-primary">
+                    <i class="fas fa-lock"></i>
+                    Proceed to Secure Payment
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <div id="orderSummary">
+                <!-- Order summary will be dynamically loaded -->
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading your order...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>GreenTap Health</h4>
+                    <p>Your trusted partner for premium health supplements and wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Security</h4>
+                    <ul>
+                        <li><i class="fas fa-lock"></i> 256-bit SSL Encryption</li>
+                        <li><i class="fas fa-shield-alt"></i> Secure Payment Gateway</li>
+                        <li><i class="fas fa-check-circle"></i> PCI DSS Compliant</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#shipping">Shipping Info</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 GreenTap Health. All rights reserved.</p>
+                <p>🔒 100% Secure Online Payments | 🚚 Free Shipping Above ₹500</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/script.js"></script>
+    <script src="js/checkout.js"></script>
+
+    <script>
+        // Enhanced checkout initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🛒 Checkout page initializing...');
+            
+            // Remove any non-online payment options
+            const nonOnlinePayments = document.querySelectorAll('.whatsapp-btn, .cod-option, [value="cod"], [value="whatsapp"]');
+            nonOnlinePayments.forEach(element => {
+                element.style.display = 'none';
+                if (element.type === 'radio') {
+                    element.disabled = true;
+                }
+            });
+            
+            // Ensure Razorpay is selected and only option
+            const razorpayRadio = document.getElementById('razorpay');
+            if (razorpayRadio) {
+                razorpayRadio.checked = true;
+                razorpayRadio.required = true;
+            }
+            
+            // Pre-fill user information from localStorage if available
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    if (user.firstName) document.getElementById('customerName').value = user.firstName + (user.lastName ? ' ' + user.lastName : '');
+                    if (user.email) document.getElementById('customerEmail').value = user.email;
+                    if (user.mobile) document.getElementById('customerPhone').value = user.mobile;
+                }
+            } catch (error) {
+                console.log('No user data found for pre-filling');
+            }
+            
+            // Form validation
+            const form = document.getElementById('checkoutForm');
+            const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', validateField);
+                input.addEventListener('input', clearFieldError);
+            });
+            
+            function validateField(e) {
+                const field = e.target;
+                const value = field.value.trim();
+                
+                // Remove existing error styling
+                field.classList.remove('error');
+                
+                if (!value) {
+                    field.classList.add('error');
+                    return false;
+                }
+                
+                // Specific validations
+                if (field.type === 'email' && !isValidEmail(value)) {
+                    field.classList.add('error');
+                    return false;
+                }
+                
+                if (field.type === 'tel' && !isValidPhone(value)) {
+                    field.classList.add('error');
+                    return false;
+                }
+                
+                if (field.name === 'pincode' && !isValidPincode(value)) {
+                    field.classList.add('error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function clearFieldError(e) {
+                e.target.classList.remove('error');
+            }
+            
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            function isValidPhone(phone) {
+                const phoneRegex = /^[0-9]{10}$/;
+                return phoneRegex.test(phone);
+            }
+            
+            function isValidPincode(pincode) {
+                const pincodeRegex = /^[0-9]{6}$/;
+                return pincodeRegex.test(pincode);
+            }
+            
+            console.log('✅ Checkout page loaded - Online payments only');
+        });
+        
+        // Add error field styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .form-group input.error,
+            .form-group select.error,
+            .form-group textarea.error {
+                border-color: #ff4444 !important;
+                box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

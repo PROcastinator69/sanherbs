@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed - Sanherbs</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .failed-container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .failed-icon {
+            font-size: 4rem;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        
+        .failed-title {
+            color: #dc3545;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .error-details {
+            background: #f8d7da;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .retry-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">🌿 Sanherbs</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="/marketplace" class="nav-link"><i class="fas fa-store"></i> Products</a>
+                <a href="/cart" class="nav-link cart-link"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-badge">0</span></a>
+                <a href="/orders" class="nav-link"><i class="fas fa-box"></i> Orders</a>
+                <a href="/order-tracking" class="nav-link"><i class="fas fa-truck"></i> Track</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-primary">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="failed-container">
+            <div class="failed-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            
+            <h1 class="failed-title">Payment Failed</h1>
+            <p>We're sorry, but your payment could not be processed at this time.</p>
+            
+            <div class="error-details">
+                <h3><i class="fas fa-exclamation-triangle"></i> What went wrong?</h3>
+                <ul style="text-align: left; margin: 15px 0;">
+                    <li>Payment was declined by your bank</li>
+                    <li>Network connectivity issues</li>
+                    <li>Insufficient funds in account</li>
+                    <li>Card details were entered incorrectly</li>
+                </ul>
+            </div>
+            
+            <div class="retry-section">
+                <h3><i class="fas fa-redo"></i> What can you do?</h3>
+                <p>Don't worry! Your cart items are still saved. You can try again with:</p>
+                <ul style="text-align: left; margin: 15px 0;">
+                    <li>A different payment method</li>
+                    <li>Check your internet connection</li>
+                    <li>Verify your card details</li>
+                    <li>Contact your bank if needed</li>
+                </ul>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="/checkout" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> Try Payment Again
+                </a>
+                <a href="/cart" class="btn btn-outline">
+                    <i class="fas fa-shopping-cart"></i> Review Cart
+                </a>
+                <a href="/marketplace" class="btn btn-secondary">
+                    <i class="fas fa-store"></i> Continue Shopping
+                </a>
+            </div>
+            
+            <div class="support-info" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h4><i class="fas fa-headset"></i> Need Help?</h4>
+                <p>Contact our support team for assistance</p>
+                <p><strong>Email:</strong> support@greentaphealth.com</p>
+                <p><strong>Phone:</strong> +91-XXXXX-XXXXX</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sanherbs. Premium Health Supplements.</p>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

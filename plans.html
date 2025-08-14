@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans - Sanherbs</title>
+     <link rel="stylesheet" href="/css/style.css">  
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>🌿 Sanherbs</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+                <li><a href="plans.html" class="nav-link active">Plans</a></li>
+                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Plans Header -->
+    <section class="plans-header">
+        <div class="container">
+            <h1>Subscription Plans</h1>
+            <p>Save more with our flexible subscription plans. Get your supplements delivered automatically and never run out of your health essentials.</p>
+        </div>
+    </section>
+
+    <!-- Plans Grid -->
+    <section class="plans-section">
+        <div class="container">
+            <div class="plans-grid">
+                <!-- Basic Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3>Basic Plan</h3>
+                        <div class="plan-price">
+                            <span class="currency">₹</span>
+                            <span class="amount">999</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="plan-subtitle">Perfect for beginners</p>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ 2 Premium Supplements</li>
+                            <li>✅ Monthly Delivery</li>
+                            <li>✅ Free Shipping</li>
+                            <li>✅ Basic Health Tips</li>
+                            <li>✅ Email Support</li>
+                            <li>❌ Personalized Consultation</li>
+                            <li>❌ Priority Support</li>
+                        </ul>
+                    </div>
+                    <div class="plan-products">
+                        <h4>Included Products:</h4>
+                        <div class="product-mini">
+                            <span>💊 Spirulina Tablets</span>
+                            <span>🍊 Vitamin C</span>
+                        </div>
+                    </div>
+                    <button class="plan-btn btn-outline" onclick="subscribePlan('Basic Plan', '₹999/month')">Choose Basic</button>
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="plan-card featured-plan">
+                    <div class="plan-badge">Most Popular</div>
+                    <div class="plan-header">
+                        <h3>Premium Plan</h3>
+                        <div class="plan-price">
+                            <span class="currency">₹</span>
+                            <span class="amount">1899</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="plan-subtitle">Best value for complete wellness</p>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ 4 Premium Supplements</li>
+                            <li>✅ Monthly Delivery</li>
+                            <li>✅ Free Express Shipping</li>
+                            <li>✅ Personalized Health Tips</li>
+                            <li>✅ Priority Email Support</li>
+                            <li>✅ Monthly Health Consultation</li>
+                            <li>✅ 15% Extra Discount</li>
+                        </ul>
+                    </div>
+                    <div class="plan-products">
+                        <h4>Included Products:</h4>
+                        <div class="product-mini">
+                            <span>💊 Spirulina Tablets</span>
+                            <span>🍊 Vitamin C</span>
+                            <span>🌿 Ashwagandha</span>
+                            <span>🌟 Turmeric</span>
+                        </div>
+                    </div>
+                    <button class="plan-btn btn-primary" onclick="subscribePlan('Premium Plan', '₹1899/month')">Choose Premium</button>
+                </div>
+
+                <!-- Elite Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3>Elite Plan</h3>
+                        <div class="plan-price">
+                            <span class="currency">₹</span>
+                            <span class="amount">2999</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p class="plan-subtitle">Complete health transformation</p>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li>✅ 6 Premium Supplements</li>
+                            <li>✅ Bi-weekly Delivery</li>
+                            <li>✅ Free Same-day Delivery</li>
+                            <li>✅ Personal Health Coach</li>
+                            <li>✅ 24/7 WhatsApp Support</li>
+                            <li>✅ Weekly Health Consultation</li>
+                            <li>✅ 25% Extra Discount</li>
+                        </ul>
+                    </div>
+                    <div class="plan-products">
+                        <h4>Included Products:</h4>
+                        <div class="product-mini">
+                            <span>💊 Spirulina</span>
+                            <span>🍊 Vitamin C</span>
+                            <span>🌿 Ashwagandha</span>
+                            <span>🌟 Turmeric</span>
+                            <span>🐟 Omega 3</span>
+                            <span>💎 Multivitamin</span>
+                        </div>
+                    </div>
+                    <button class="plan-btn btn-outline" onclick="subscribePlan('Elite Plan', '₹2999/month')">Choose Elite</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan Benefits -->
+    <section class="plan-benefits">
+        <div class="container">
+            <h2>Why Choose Subscription?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">💰</div>
+                    <h4>Save More Money</h4>
+                    <p>Get up to 25% discount compared to individual purchases</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">🚚</div>
+                    <h4>Never Run Out</h4>
+                    <p>Automatic delivery ensures you never miss your supplements</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">🎯</div>
+                    <h4>Personalized Care</h4>
+                    <p>Get health recommendations tailored to your needs</p>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">⏰</div>
+                    <h4>Flexible Schedule</h4>
+                    <p>Pause, skip, or modify your subscription anytime</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4>Can I change my plan anytime?</h4>
+                    <p>Yes, you can upgrade, downgrade, or cancel your subscription at any time through your account dashboard.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>What if I want to skip a month?</h4>
+                    <p>You can easily skip any delivery up to 24 hours before your next scheduled shipment.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Are there any hidden fees?</h4>
+                    <p>No, all our plans include free shipping and there are no additional hidden charges.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How do I track my delivery?</h4>
+                    <p>We provide real-time tracking information via SMS and email for all deliveries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🌿 Sanherbs</h4>
+                    <p>Your trusted partner for premium health supplements and natural wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="login.html">Login/Register</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>📱 +91 9876543210</p>
+                    <p>📧 info@greentaphealth.com</p>
+                    <p>📍 Khadewadi, Maharashtra, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 sanherbs. All rights reserved. Made with 💚 for your health</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

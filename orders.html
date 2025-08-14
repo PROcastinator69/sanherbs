@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Sanherbs</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/orders.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">🌿 Sanherbs</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="/marketplace" class="nav-link"><i class="fas fa-store"></i> Products</a>
+                <a href="/cart" class="nav-link cart-link"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-badge">0</span></a>
+                <a href="/orders" class="nav-link"><i class="fas fa-box"></i> Orders</a>
+                <a href="/order-tracking" class="nav-link"><i class="fas fa-truck"></i> Track</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-primary">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="orders-container">
+            <!-- Orders Header -->
+            <div class="orders-header">
+                <h1><i class="fas fa-box"></i> My Orders</h1>
+                <p>Track and manage your health supplement orders</p>
+            </div>
+
+            <!-- Orders Controls -->
+            <div class="orders-controls">
+                <div class="order-filter">
+                    <label for="orderFilter">Filter by status:</label>
+                    <select id="orderFilter">
+                        <option value="all">All Orders</option>
+                        <option value="created">Order Created</option>
+                        <option value="paid">Payment Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                
+                <button id="refreshOrdersBtn" class="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="ordersLoading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>Loading your orders...</p>
+            </div>
+
+            <!-- Orders List -->
+            <div id="ordersContainer">
+                <!-- Orders will be dynamically loaded here -->
+                <div class="no-orders">
+                    <div class="no-orders-icon">📦</div>
+                    <h3>No orders found</h3>
+                    <p>You haven't placed any orders yet.</p>
+                    <a href="/marketplace" class="btn btn-primary">Start Shopping</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sanherbs. Premium Health Supplements.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/script.js"></script>
+    <script src="/js/orders.js"></script>
+</body>
+</html>

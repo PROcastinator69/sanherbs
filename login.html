@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'; object-src 'none';">
+    <title>Login - GreenTap Health</title>
+     <link rel="stylesheet" href="/css/style.css">  
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>🌿 GreenTap Health</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="login.html" class="nav-link active login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-form-container">
+                    <div class="auth-header">
+                        <h2 id="authTitle">Welcome Back</h2>
+                        <p id="authSubtitle">Sign in to your GreenTap Health account</p>
+                    </div>
+
+                    <!-- Message Display -->
+                    <div id="message" class="message"></div>
+
+                    <!-- Auth Form -->
+                    <form class="auth-form" id="authForm">
+                        <div class="input-group">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="tel" id="mobile" placeholder="Enter 10-digit mobile number" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-primary" id="loginBtn">Sign In</button>
+                            <button type="button" class="btn-secondary" id="signupBtn">Create Account</button>
+                        </div>
+                    </form>
+
+                    <div class="auth-toggle">
+                        <p id="toggleText">Don't have an account? <span id="toggleLink">Sign up here</span></p>
+                    </div>
+
+                    <div class="auth-benefits">
+                        <h4>Why Join GreenTap Health?</h4>
+                        <ul>
+                            <li>🎯 Personalized supplement recommendations</li>
+                            <li>💰 Exclusive member discounts</li>
+                            <li>📦 Priority delivery and support</li>
+                            <li>📊 Track your health journey</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="auth-image">
+                    <div class="image-placeholder auth-placeholder">
+                        <span class="image-text">Your Health Journey</span>
+                        <div class="image-icon">🌱</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Section (Hidden initially) -->
+    <section id="main-section" class="main-section" style="display: none;">
+        <div class="container">
+            <div class="welcome-header">
+                <h2 id="welcome-text">Welcome!</h2>
+                <button class="btn-secondary" id="logoutBtn">Logout</button>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>Your Health Profile</h3>
+                    <p>Complete your profile for personalized recommendations</p>
+                    <a href="profile.html" class="btn-primary">View Profile</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Recent Orders</h3>
+                    <p>Track your supplement orders and delivery status</p>
+                    <button class="btn-primary">View Orders</button>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Subscription Plans</h3>
+                    <p>Save more with our monthly subscription plans</p>
+                    <a href="plans.html" class="btn-primary">View Plans</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Health Tips</h3>
+                    <div id="health-tips">
+                        <div class="tip-item">💡 Take supplements with meals for better absorption</div>
+                        <div class="tip-item">💧 Drink plenty of water throughout the day</div>
+                        <div class="tip-item">🏃‍♂️ Combine supplements with regular exercise</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🌿 GreenTap Health</h4>
+                    <p>Your trusted partner for premium health supplements and natural wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="plans.html">Subscription Plans</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>📱 +91 9876543210</p>
+                    <p>📧 info@greentaphealth.com</p>
+                    <p>📍 Khadewadi, Maharashtra, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GreenTap Health. All rights reserved. Made with 💚 for your health</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

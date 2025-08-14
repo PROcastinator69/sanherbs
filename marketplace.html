@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanherbs - Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-leaf"></i>sanherbs</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link active">Products</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+                </a></li>
+                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Marketplace Header -->
+    <section class="marketplace-header">
+        <div class="container">
+            <h1><i class="fas fa-store"></i> Health Supplements Marketplace</h1>
+            <p>Premium health supplements delivered to your doorstep</p>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for supplements...">
+                <button class="search-btn" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-filter">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">All Products</button>
+                <button class="filter-btn" data-category="immunity">Immunity</button>
+                <button class="filter-btn" data-category="energy">Energy</button>
+                <button class="filter-btn" data-category="vitamins">Vitamins</button>
+                <button class="filter-btn" data-category="minerals">Minerals</button>
+                <button class="filter-btn" data-category="protein">Protein</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <div class="products-grid">
+                
+                <!-- Product 1: Immunity Booster -->
+                <div class="product-card" data-category="immunity">
+                    <div class="product-badge">Best Seller</div>
+                    <div class="image-placeholder">
+                        <div class="image-text">Immunity Booster</div>
+                        <div class="image-icon">🛡️</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Premium Immunity Booster</h3>
+                        <p class="product-subtitle">60 Tablets • 1 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Natural</span>
+                            <span class="benefit-mini">Lab Tested</span>
+                            <span class="benefit-mini">Fast Acting</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹899</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Premium Immunity Booster" 
+                                    data-price="899" 
+                                    data-product-id="immunity-booster">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Premium Immunity Booster" 
+                                    data-price="899">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2: Multivitamin -->
+                <div class="product-card" data-category="vitamins">
+                    <div class="image-placeholder">
+                        <div class="image-text">Multivitamin</div>
+                        <div class="image-icon">💊</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Complete Multivitamin</h3>
+                        <p class="product-subtitle">90 Tablets • 3 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">26 Nutrients</span>
+                            <span class="benefit-mini">Daily Support</span>
+                            <span class="benefit-mini">Energy</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹1,299</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Complete Multivitamin" 
+                                    data-price="1299" 
+                                    data-product-id="multivitamin">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Complete Multivitamin" 
+                                    data-price="1299">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3: Omega-3 -->
+                <div class="product-card" data-category="immunity">
+                    <div class="image-placeholder">
+                        <div class="image-text">Omega-3</div>
+                        <div class="image-icon">🐟</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Pure Omega-3 Fish Oil</h3>
+                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Heart Health</span>
+                            <span class="benefit-mini">Brain Support</span>
+                            <span class="benefit-mini">Pure</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹799</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Pure Omega-3 Fish Oil" 
+                                    data-price="799" 
+                                    data-product-id="omega-3">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Pure Omega-3 Fish Oil" 
+                                    data-price="799">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4: Vitamin D3 -->
+                <div class="product-card" data-category="vitamins">
+                    <div class="image-placeholder">
+                        <div class="image-text">Vitamin D3</div>
+                        <div class="image-icon">☀️</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Vitamin D3 5000 IU</h3>
+                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Bone Health</span>
+                            <span class="benefit-mini">Immunity</span>
+                            <span class="benefit-mini">High Potency</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹599</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Vitamin D3 5000 IU" 
+                                    data-price="599" 
+                                    data-product-id="vitamin-d3">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Vitamin D3 5000 IU" 
+                                    data-price="599">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5: Probiotics -->
+                <div class="product-card" data-category="immunity">
+                    <div class="image-placeholder">
+                        <div class="image-text">Probiotics</div>
+                        <div class="image-icon">🦠</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Advanced Probiotics</h3>
+                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Digestive Health</span>
+                            <span class="benefit-mini">50 Billion CFU</span>
+                            <span class="benefit-mini">10 Strains</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹1,199</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Advanced Probiotics" 
+                                    data-price="1199" 
+                                    data-product-id="probiotics">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Advanced Probiotics" 
+                                    data-price="1199">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6: Magnesium -->
+                <div class="product-card" data-category="minerals">
+                    <div class="image-placeholder">
+                        <div class="image-text">Magnesium</div>
+                        <div class="image-icon">⚡</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Magnesium Glycinate</h3>
+                        <p class="product-subtitle">90 Capsules • 3 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Sleep Support</span>
+                            <span class="benefit-mini">Muscle Recovery</span>
+                            <span class="benefit-mini">Gentle</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹899</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Magnesium Glycinate" 
+                                    data-price="899" 
+                                    data-product-id="magnesium">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Magnesium Glycinate" 
+                                    data-price="899">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 7: Ashwagandha -->
+                <div class="product-card" data-category="energy">
+                    <div class="image-placeholder">
+                        <div class="image-text">Ashwagandha</div>
+                        <div class="image-icon">🌿</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Organic Ashwagandha</h3>
+                        <p class="product-subtitle">60 Tablets • 2 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">Stress Relief</span>
+                            <span class="benefit-mini">Energy</span>
+                            <span class="benefit-mini">Organic</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹749</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Organic Ashwagandha" 
+                                    data-price="749" 
+                                    data-product-id="ashwagandha">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Organic Ashwagandha" 
+                                    data-price="749">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 8: Protein Powder -->
+                <div class="product-card" data-category="protein">
+                    <div class="image-placeholder">
+                        <div class="image-text">Protein Powder</div>
+                        <div class="image-icon">💪</div>
+                    </div>
+                    <div class="product-info">
+                        <h3>Whey Protein Isolate</h3>
+                        <p class="product-subtitle">500g • 1 Month Supply</p>
+                        
+                        <div class="product-benefits">
+                            <span class="benefit-mini">25g Protein</span>
+                            <span class="benefit-mini">Fast Absorption</span>
+                            <span class="benefit-mini">Chocolate</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            <span class="current-price">₹1,599</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" 
+                                    data-product="Whey Protein Isolate" 
+                                    data-price="1599" 
+                                    data-product-id="protein-powder">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn-secondary buy-now-btn" 
+                                    data-product="Whey Protein Isolate" 
+                                    data-price="1599">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Sanherbs</h4>
+                    <p>Your trusted partner for premium health supplements and wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="marketplace.html">Products</a></li>
+                        <li><a href="plans.html">Subscription Plans</a></li>
+                        <li><a href="orders.html">Track Orders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#shipping">Shipping Info</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 sanherbs. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

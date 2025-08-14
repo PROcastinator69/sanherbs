@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanherbs</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/orders.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .tracking-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .tracking-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8f5e8;
+        }
+        
+        .tracking-search {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .search-input {
+            flex: 1;
+        }
+        
+        .tracking-results {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .current-status {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .status-badge-large {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .timeline-item.completed .timeline-dot {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .timeline-item.current .timeline-dot {
+            background: #ffc107;
+            border-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -37px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #e9ecef;
+            border: 3px solid #e9ecef;
+        }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #28a745;
+        }
+        
+        .timeline-item.completed .timeline-content {
+            border-left-color: #28a745;
+        }
+        
+        .timeline-item.current .timeline-content {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">🌿 Sanherbs</a>
+            <div class="nav-menu">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="/marketplace" class="nav-link"><i class="fas fa-store"></i> Products</a>
+                <a href="/cart" class="nav-link cart-link"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-badge">0</span></a>
+                <a href="/orders" class="nav-link"><i class="fas fa-box"></i> Orders</a>
+                <a href="/order-tracking" class="nav-link"><i class="fas fa-truck"></i> Track</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-primary">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="tracking-container">
+            <!-- Header -->
+            <div class="tracking-header">
+                <h1><i class="fas fa-truck"></i> Track Your Order</h1>
+                <p>Enter your order ID to get real-time tracking information</p>
+            </div>
+
+            <!-- Tracking Search -->
+            <div class="tracking-search">
+                <h3>Find Your Order</h3>
+                <div class="search-form">
+                    <div class="search-input">
+                        <label for="orderIdInput">Order ID or Order Number</label>
+                        <input type="text" id="orderIdInput" placeholder="Enter your order ID (e.g., ORDER_1234567)" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    <button type="button" id="trackBtn" class="btn btn-primary" style="padding: 12px 25px;">
+                        <i class="fas fa-search"></i> Track Order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tracking Results -->
+            <div id="trackingResults" class="tracking-results">
+                <!-- Current Status -->
+                <div class="current-status">
+                    <h3>Current Status</h3>
+                    <div class="status-badge-large status-processing" id="currentStatusBadge">
+                        Processing
+                    </div>
+                    <p id="statusDescription">Your order is being processed</p>
+                    <p><strong>Order ID:</strong> <span id="displayOrderId">-</span></p>
+                    <p><strong>Last Updated:</strong> <span id="lastUpdated">-</span></p>
+                </div>
+
+                <!-- Order Details -->
+                <div id="orderDetailsSection" style="margin-bottom: 30px;">
+                    <h4><i class="fas fa-receipt"></i> Order Details</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <p><strong>Amount:</strong> ₹<span id="orderAmount">0</span></p>
+                        <p><strong>Items:</strong> <span id="orderItems">-</span></p>
+                        <p><strong>Delivery Address:</strong> <span id="deliveryAddress">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Tracking Timeline -->
+                <div class="timeline-section">
+                    <h4><i class="fas fa-route"></i> Order Timeline</h4>
+                    <div class="timeline" id="trackingTimeline">
+                        <!-- Timeline items will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Delivery Information -->
+                <div id="deliveryInfo" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; display: none;">
+                    <h4><i class="fas fa-truck"></i> Delivery Information</h4>
+                    <p><strong>Tracking ID:</strong> <span id="trackingId">-</span></p>
+                    <p><strong>Courier:</strong> <span id="courierName">-</span></p>
+                    <p><strong>Estimated Delivery:</strong> <span id="estimatedDelivery">-</span></p>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="trackingError" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 20px; display: none;">
+                <h4><i class="fas fa-exclamation-triangle"></i> Order Not Found</h4>
+                <p>Please check your order ID and try again. Make sure you've entered the complete order ID.</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/orders" class="btn btn-outline">
+                    <i class="fas fa-list"></i> View All Orders
+                </a>
+                <a href="/marketplace" class="btn btn-secondary">
+                    <i class="fas fa-store"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sanherbs. Premium Health Supplements.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/script.js"></script>
+    <script src="/js/tracking.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const trackBtn = document.getElementById('trackBtn');
+            const orderInput = document.getElementById('orderIdInput');
+            
+            // Check URL for order ID parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderIdFromUrl = urlParams.get('orderId');
+            if (orderIdFromUrl) {
+                orderInput.value = orderIdFromUrl;
+                trackOrder(orderIdFromUrl);
+            }
+            
+            trackBtn.addEventListener('click', function() {
+                const orderId = orderInput.value.trim();
+                if (orderId) {
+                    trackOrder(orderId);
+                } else {
+                    alert('Please enter an order ID');
+                }
+            });
+            
+            // Enter key support
+            orderInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    trackBtn.click();
+                }
+            });
+        });
+        
+        async function trackOrder(orderId) {
+            const trackingResults = document.getElementById('trackingResults');
+            const trackingError = document.getElementById('trackingError');
+            
+            // Hide previous results
+            trackingResults.style.display = 'none';
+            trackingError.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/tracking/order/${orderId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTrackingInfo(data.tracking);
+                    trackingResults.style.display = 'block';
+                } else {
+                    trackingError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Tracking error:', error);
+                trackingError.style.display = 'block';
+            }
+        }
+        
+        function displayTrackingInfo(tracking) {
+            // Update order details
+            document.getElementById('displayOrderId').textContent = tracking.order_id;
+            document.getElementById('orderAmount').textContent = tracking.amount || '0';
+            document.getElementById('orderItems').textContent = tracking.items || 'Health Supplements';
+            document.getElementById('lastUpdated').textContent = new Date(tracking.last_updated || tracking.created_at).toLocaleString();
+            
+            // Update current status
+            const statusBadge = document.getElementById('currentStatusBadge');
+            statusBadge.textContent = getStatusDisplayName(tracking.order_status);
+            statusBadge.className = `status-badge-large status-${tracking.order_status}`;
+            
+            // Update timeline
+            updateTimeline(tracking);
+            
+            // Show delivery info if available
+            if (tracking.tracking_id) {
+                document.getElementById('trackingId').textContent = tracking.tracking_id;
+                document.getElementById('courierName').textContent = tracking.courier_name || 'TBD';
+                document.getElementById('estimatedDelivery').textContent = tracking.estimated_delivery ? 
+                    new Date(tracking.estimated_delivery).toLocaleDateString() : 'TBD';
+                document.getElementById('deliveryInfo').style.display = 'block';
+            }
+        }
+        
+        function updateTimeline(tracking) {
+            const timeline = document.getElementById('trackingTimeline');
+            const statuses = [
+                { key: 'created', label: 'Order Placed', icon: 'fas fa-check' },
+                { key: 'paid', label: 'Payment Confirmed', icon: 'fas fa-credit-card' },
+                { key: 'processing', label: 'Processing', icon: 'fas fa-cogs' },
+                { key: 'shipped', label: 'Shipped', icon: 'fas fa-truck' },
+                { key: 'delivered', label: 'Delivered', icon: 'fas fa-box-open' }
+            ];
+            
+            timeline.innerHTML = '';
+            
+            statuses.forEach((status, index) => {
+                const isCompleted = isStatusCompleted(status.key, tracking.order_status);
+                const isCurrent = status.key === tracking.order_status;
+                
+                const timelineItem = document.createElement('div');
+                timelineItem.className = `timeline-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`;
+                
+                timelineItem.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5><i class="${status.icon}"></i> ${status.label}</h5>
+                        <p>${isCompleted ? 'Completed' : (isCurrent ? 'In Progress' : 'Pending')}</p>
+                        ${isCompleted ? `<small>${new Date(tracking.created_at).toLocaleDateString()}</small>` : ''}
+                    </div>
+                `;
+                
+                timeline.appendChild(timelineItem);
+            });
+        }
+        
+        function isStatusCompleted(targetStatus, currentStatus) {
+            const statusOrder = ['created', 'paid', 'processing', 'shipped', 'delivered'];
+            return statusOrder.indexOf(currentStatus) >= statusOrder.indexOf(targetStatus);
+        }
+        
+        function getStatusDisplayName(status) {
+            const statusMap = {
+                'created': 'Order Created',
+                'paid': 'Payment Confirmed',
+                'processing': 'Processing',
+                'shipped': 'Shipped',
+                'delivered': 'Delivered',
+                'cancelled': 'Cancelled'
+            };
+            return statusMap[status] || status.charAt(0).toUpperCase() + status.slice(1);
+        }
+    </script>
+</body>
+</html>

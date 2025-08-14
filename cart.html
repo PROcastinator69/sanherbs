@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - sanherbs</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-leaf"></i> sanherbs</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Products</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="cart.html" class="nav-link cart-link active">
+                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+                </a></li>
+                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Header -->
+    <section class="cart-header">
+        <div class="container">
+            <h1><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h1>
+            <p>Review your items and proceed to secure checkout</p>
+        </div>
+    </section>
+
+    <!-- Cart Content -->
+    <section class="cart-content">
+        <div class="container">
+            <div class="cart-layout">
+                <!-- Cart Items Section -->
+                <div class="cart-items-section">
+                    <div id="cartItems" class="cart-items">
+                        <!-- Cart items will be populated by JavaScript -->
+                        <div class="cart-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading your cart...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cart Summary Section -->
+                <div class="cart-summary-section">
+                    <div id="cartSummary" class="cart-summary">
+                        <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+                        
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotalAmount">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Shipping:</span>
+                                <span id="shippingAmount">₹0.00</span>
+                            </div>
+                            <div class="summary-row total-row">
+                                <span>Total:</span>
+                                <span id="totalAmount">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <div id="shippingNote" class="shipping-note">
+                            <!-- Shipping note will be populated by JavaScript -->
+                        </div>
+
+                        <button id="checkoutBtn" class="checkout-btn">
+                            <i class="fas fa-lock"></i> Proceed to Checkout
+                        </button>
+
+                        <a href="marketplace.html" class="continue-shopping-btn">
+                            <i class="fas fa-arrow-left"></i> Continue Shopping
+                        </a>
+
+                        <button id="clearCartBtn" class="clear-cart-btn">
+                            <i class="fas fa-trash"></i> Clear Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Empty Cart Message (Hidden by default) -->
+    <div id="emptyCartMessage" class="empty-cart" style="display: none;">
+        <div class="container">
+            <div class="empty-cart-content">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3>Your cart is empty</h3>
+                <p>Looks like you haven't added any health supplements yet.<br>
+                   Start shopping to boost your wellness journey!</p>
+                <a href="marketplace.html" class="shop-now-btn">
+                    <i class="fas fa-pills"></i> Shop Supplements
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Notification -->
+    <div id="cartNotification" class="cart-notification" style="display: none;">
+        <div class="notification-content">
+            <span class="notification-icon"></span>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>sanherbs</h4>
+                    <p>Your trusted partner for premium health supplements and wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="marketplace.html">Products</a></li>
+                        <li><a href="plans.html">Subscription Plans</a></li>
+                        <li><a href="orders.html">Track Orders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#shipping">Shipping Info</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 sanherbs. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

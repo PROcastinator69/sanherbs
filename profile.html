@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Sanherbs</title>
+      <link rel="stylesheet" href="/css/style.css">  
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>🌿 Sanherbs</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="profile-header">
+                <h1>My Health Profile</h1>
+                <p>Manage your personal information and health preferences</p>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <div class="avatar-placeholder">
+                                <span class="avatar-icon">👤</span>
+                            </div>
+                        </div>
+                        <h3>John Doe</h3>
+                        <p>Member since Jan 2025</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">12</span>
+                                <span class="stat-label">Orders</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">3</span>
+                                <span class="stat-label">Active Plans</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-nav">
+                        <ul>
+                            <li><a href="#personal" class="profile-nav-link active">Personal Info</a></li>
+                            <li><a href="#health" class="profile-nav-link">Health Preferences</a></li>
+                            <li><a href="#orders" class="profile-nav-link">Order History</a></li>
+                            <li><a href="#settings" class="profile-nav-link">Settings</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="profile-main">
+                    <!-- Personal Information -->
+                    <div id="personal" class="profile-section-content active">
+                        <h2>Personal Information</h2>
+                        <form class="profile-form">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" id="firstName" value="John" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" value="Doe" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" value="john.doe@example.com" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="phone">Phone</label>
+                                    <input type="tel" id="phone" value="+91 9876543210" required>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="address">Address</label>
+                                <textarea id="address" rows="3">Khadewadi, Maharashtra, India</textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary">Update Information</button>
+                        </form>
+                    </div>
+
+                    <!-- Health Preferences -->
+                    <div id="health" class="profile-section-content">
+                        <h2>Health Preferences</h2>
+                        <div class="health-form">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label for="age">Age</label>
+                                    <input type="number" id="age" value="30" min="18" max="100">
+                                </div>
+                                <div class="input-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Health Goals (Select all that apply)</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked> Boost Immunity
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked> Increase Energy
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Weight Management
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Better Sleep
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Stress Relief
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Heart Health
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Allergies & Dietary Restrictions</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Vegetarian
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Vegan
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Gluten-Free
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Dairy-Free
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary">Update Preferences</button>
+                        </div>
+                    </div>
+
+                    <!-- Order History -->
+                    <div id="orders" class="profile-section-content">
+                        <h2>Order History</h2>
+                        <div class="orders-list">
+                            <div class="order-item">
+                                <div class="order-header">
+                                    <span class="order-id">#GT001</span>
+                                    <span class="order-date">Jan 15, 2025</span>
+                                    <span class="order-status delivered">Delivered</span>
+                                </div>
+                                <div class="order-products">
+                                    <p>Spirulina Tablets x1, Vitamin C x1</p>
+                                </div>
+                                <div class="order-total">₹899</div>
+                            </div>
+
+                            <div class="order-item">
+                                <div class="order-header">
+                                    <span class="order-id">#GT002</span>
+                                    <span class="order-date">Jan 10, 2025</span>
+                                    <span class="order-status shipped">Shipped</span>
+                                </div>
+                                <div class="order-products">
+                                    <p>Ashwagandha Capsules x1</p>
+                                </div>
+                                <div class="order-total">₹599</div>
+                            </div>
+
+                            <div class="order-item">
+                                <div class="order-header">
+                                    <span class="order-id">#GT003</span>
+                                    <span class="order-date">Jan 5, 2025</span>
+                                    <span class="order-status processing">Processing</span>
+                                </div>
+                                <div class="order-products">
+                                    <p>Complete Multivitamin x1, Turmeric Capsules x1</p>
+                                </div>
+                                <div class="order-total">₹999</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div id="settings" class="profile-section-content">
+                        <h2>Account Settings</h2>
+                        <div class="settings-form">
+                            <div class="setting-item">
+                                <h4>Notifications</h4>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked> Email notifications
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked> SMS notifications
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Marketing emails
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <h4>Privacy</h4>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked> Share health data for personalized recommendations
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox"> Allow data for research purposes
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="setting-item">
+                                <h4>Subscription Management</h4>
+                                <p>Current Plan: <strong>Premium Plan</strong></p>
+                                <div class="setting-actions">
+                                    <button class="btn-outline">Pause Subscription</button>
+                                    <button class="btn-outline">Change Plan</button>
+                                    <button class="btn-danger">Cancel Subscription</button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🌿 GreenTap Health</h4>
+                    <p>Your trusted partner for premium health supplements and natural wellness solutions.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="plans.html">Subscription Plans</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>📱 +91 9876543210</p>
+                    <p>📧 info@greentaphealth.com</p>
+                    <p>📍 Khadewadi, Maharashtra, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sanherbs. All rights reserved. Made with 💚 for your health</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
