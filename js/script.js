@@ -28,29 +28,26 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProductOrdering();
     initializePlanSubscription();
     
-    // Update cart count on page load
     updateCartCount();
     
-    // Check if user is already logged in - FIXED COMPARISON
     if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
         checkAuth();
     }
     
-    // Load products if on marketplace page - FIXED COMPARISON
     if (window.location.pathname === '/marketplace' || window.location.pathname === '/marketplace.html') {
         loadProducts();
     }
     
-    // Load plans if on plans page - FIXED COMPARISON
     if (window.location.pathname === '/plans' || window.location.pathname === '/plans.html') {
         loadPlans();
     }
 
-    // Load user profile if authenticated
-    if (authToken) {
-        loadUserProfile();
-    }
+    // ❌ COMMENT OUT THIS LINE TO FIX 404 ERROR
+    // if (authToken) {
+    //     loadUserProfile();
+    // }
 });
+
 
 // FIXED FUNCTION ORDER: toggleAuthMode BEFORE setAuthMode
 function toggleAuthMode() {
@@ -1013,6 +1010,7 @@ function logout() {
 
 // Make logout function globally available
 window.logout = logout;
+
 
 
 
