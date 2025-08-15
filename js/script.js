@@ -140,64 +140,68 @@ function initializeAuth() {
 }
 
 // ✅ FIXED Product Ordering - Use Event Delegation
+// Product Ordering Initialization - FIXED WITH EVENT DELEGATION AND POPUP
 function initializeProductOrdering() {
-    // Remove direct event listeners and use event delegation instead
+    // Use event delegation for all add to cart and buy now buttons
     document.addEventListener('click', function(event) {
         // Handle Add to Cart buttons
-        if (event.target.closest('.add-to-cart-btn')) {
+        const addToCartBtn = event.target.closest('.add-to-cart-btn');
+        if (addToCartBtn) {
             event.preventDefault();
-            const btn = event.target.closest('.add-to-cart-btn');
             
-            const productName = btn.getAttribute('data-product');
-            const price = btn.getAttribute('data-price');
-            const productId = btn.getAttribute('data-product-id');
-            const image = btn.getAttribute('data-image');
-            const category = btn.getAttribute('data-category');
+            const productName = addToCartBtn.getAttribute('data-product');
+            const price = addToCartBtn.getAttribute('data-price');
+            const productId = addToCartBtn.getAttribute('data-product-id');
+            const image = addToCartBtn.getAttribute('data-image');
+            const category = addToCartBtn.getAttribute('data-category');
             
             console.log('Add to cart clicked:', { productName, price, productId });
             
-            if (productName && price) {
-                addToCart({
-                    id: productId || `product_${Date.now()}`,
-                    name: productName, 
-                    price: price,
-                    image: image,
-                    category: category
-                });
-            } else {
-                console.error('Missing product data');
+            if (!productName || !price) {
                 showMessage("❌ Product information missing", "error");
+                return;
             }
+
+            // Add to cart
+            addToCart({
+                id: productId || `product_${Date.now()}`,
+                name: productName, 
+                price: price,
+                image: image,
+                category: category
+            });
+
+            // Show popup notification
+            showPopupNotification(`${productName} +1 added to cart`);
         }
         
         // Handle Buy Now buttons
-        if (event.target.closest('.buy-now-btn')) {
+        const buyNowBtn = event.target.closest('.buy-now-btn');
+        if (buyNowBtn) {
             event.preventDefault();
-            const btn = event.target.closest('.buy-now-btn');
             
-            const productName = btn.getAttribute('data-product');
-            const price = btn.getAttribute('data-price');
-            const productId = btn.getAttribute('data-product-id');
-            const image = btn.getAttribute('data-image');
-            const category = btn.getAttribute('data-category');
+            const productName = buyNowBtn.getAttribute('data-product');
+            const price = buyNowBtn.getAttribute('data-price');
+            const productId = buyNowBtn.getAttribute('data-product-id');
+            const image = buyNowBtn.getAttribute('data-image');
+            const category = buyNowBtn.getAttribute('data-category');
             
-            console.log('Buy now clicked:', { productName, price, productId });
-            
-            if (productName && price) {
-                buyNow({
-                    id: productId || `product_${Date.now()}`,
-                    name: productName,
-                    price: price,
-                    image: image,
-                    category: category
-                });
-            } else {
-                console.error('Missing product data');
+            if (!productName || !price) {
                 showMessage("❌ Product information missing", "error");
+                return;
             }
+
+            buyNow({
+                id: productId || `product_${Date.now()}`,
+                name: productName,
+                price: price,
+                image: image,
+                category: category
+            });
         }
     });
 }
+
 
 // Plan Subscription Initialization - ENHANCED FOR SANHERBS
 function initializePlanSubscription() {
@@ -901,3 +905,4 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
+
