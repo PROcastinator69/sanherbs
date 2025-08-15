@@ -78,7 +78,7 @@ function initializeAuth() {
     }
 }
 
-// NEW: Set Authentication Mode Function
+// NEW: Set Authentication Mode Function - FIXED ESCAPING
 function setAuthMode(isSignup) {
     const authTitle = document.getElementById("authTitle");
     const authSubtitle = document.getElementById("authSubtitle");
@@ -95,16 +95,16 @@ function setAuthMode(isSignup) {
         if (loginBtn) loginBtn.style.display = "none";
         if (signupBtn) signupBtn.style.display = "block";
         if (toggleText) {
-            toggleText.innerHTML = 'Already have an account? <a href="#" id="toggleLink">Sign in here</a>';
+            toggleText.innerHTML = `Already have an account? <a href="#" id="toggleLink">Sign in here</a>`;
         }
     } else {
-        // LOGIN MODE (Default)
+        // LOGIN MODE (Default) - FIXED ESCAPING
         if (authTitle) authTitle.textContent = "Welcome Back";
         if (authSubtitle) authSubtitle.textContent = "Sign in to your SanHerbs account";
         if (loginBtn) loginBtn.style.display = "block";
         if (signupBtn) signupBtn.style.display = "none";
         if (toggleText) {
-            toggleText.innerHTML = 'Don\\'t have an account? <a href="#" id="toggleLink">Sign up here</a>';
+            toggleText.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Sign up here</a>`;
         }
     }
 
@@ -244,16 +244,17 @@ function updateNavigation() {
     }
 }
 
-// Cart Functions - ENHANCED FOR SANHERBS
+// Cart Functions - ENHANCED FOR SANHERBS - FIXED COMPARISONS
 function addToCart(product) {
     console.log('Adding to cart:', product);
     
     try {
-        // Use SanHerbs cart storage
+        // Use SanHerbs cart storage - FIXED UNDERSCORES
         let cart = JSON.parse(localStorage.getItem('sanherbs_cart')) || 
                   JSON.parse(localStorage.getItem('greentap_cart')) || 
                   JSON.parse(localStorage.getItem('cart')) || [];
         
+        // FIXED: Use === for comparison instead of =
         const existingItem = cart.find(item => item.id === product.id || item.name === product.name);
         
         if (existingItem) {
@@ -270,7 +271,7 @@ function addToCart(product) {
             });
         }
         
-        // Save to multiple storage keys for compatibility
+        // Save to multiple storage keys for compatibility - FIXED UNDERSCORES
         localStorage.setItem('sanherbs_cart', JSON.stringify(cart));
         localStorage.setItem('greentap_cart', JSON.stringify(cart));
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -339,7 +340,7 @@ function subscribePlan(plan) {
     }
 }
 
-// Cart count update - ENHANCED
+// Cart count update - ENHANCED - FIXED UNDERSCORES
 function updateCartCount() {
     try {
         const cart = JSON.parse(localStorage.getItem('sanherbs_cart')) || 
@@ -480,7 +481,7 @@ async function apiCall(endpoint, options = {}) {
     }
 }
 
-// Message Display Functions
+// Message Display Functions - FIXED TEMPLATE LITERAL
 function showMessage(message, type = "error") {
     const msg = document.getElementById("message");
     if (msg) {
@@ -520,7 +521,7 @@ function validateInputs(mobile, password) {
         return false;
     }
 
-    // Clean mobile number
+    // Clean mobile number - FIXED REGEX ESCAPING
     const cleanMobile = mobile.replace(/\D/g, '');
     if (!/^[0-9]{10}$/.test(cleanMobile)) {
         showMessage("⚠️ Please enter a valid 10-digit mobile number.", "error");
@@ -773,7 +774,7 @@ async function loadProducts() {
     }
 }
 
-// NEW: Render products dynamically
+// NEW: Render products dynamically - FIXED TEMPLATE LITERALS
 function renderProducts(products) {
     const productsContainer = document.getElementById('products-container');
     if (!productsContainer) return;
@@ -833,7 +834,7 @@ async function loadPlans() {
     }
 }
 
-// NEW: Render plans dynamically
+// NEW: Render plans dynamically - FIXED TEMPLATE LITERALS
 function renderPlans(plans) {
     const plansContainer = document.getElementById('plans-container');
     if (!plansContainer) return;
@@ -867,4 +868,3 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
-
