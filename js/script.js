@@ -906,3 +906,50 @@ window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
 
+// Popup notification function - ADD THIS TO SCRIPT.JS
+function showPopupNotification(message) {
+    // Remove existing popup if present
+    let existingPopup = document.getElementById('cart-popup-notification');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create new popup
+    const popup = document.createElement('div');
+    popup.id = 'cart-popup-notification';
+    popup.style.position = 'fixed';
+    popup.style.top = '20px';
+    popup.style.right = '20px';
+    popup.style.backgroundColor = '#4CAF50';
+    popup.style.color = 'white';
+    popup.style.padding = '15px 20px';
+    popup.style.borderRadius = '8px';
+    popup.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    popup.style.zIndex = '10000';
+    popup.style.fontSize = '14px';
+    popup.style.fontWeight = '500';
+    popup.style.opacity = '0';
+    popup.style.transform = 'translateX(100%)';
+    popup.style.transition = 'all 0.3s ease';
+    popup.textContent = message;
+    
+    document.body.appendChild(popup);
+    
+    // Animate in
+    setTimeout(() => {
+        popup.style.opacity = '1';
+        popup.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Animate out and remove
+    setTimeout(() => {
+        popup.style.opacity = '0';
+        popup.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+
