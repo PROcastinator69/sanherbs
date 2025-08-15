@@ -19,6 +19,7 @@ app.use(helmet({
 }));
 
 // CORS configuration - Updated for your architecture
+// CORS configuration - FIXED for GitHub Pages + Render
 app.use(cors({
     origin: [
         'https://sanherbs.com',
@@ -27,8 +28,14 @@ app.use(cors({
         'http://127.0.0.1:3000'
     ],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight OPTIONS requests
+app.options('*', cors());
+
 
 // Rate limiting
 const limiter = rateLimit({
@@ -319,3 +326,4 @@ async function startServer() {
 startServer();
 
 module.exports = app;
+
