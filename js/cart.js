@@ -500,5 +500,43 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShoppingCart;
 }
 
+// EMERGENCY CART DISPLAY - Add at bottom of cart.js
+setTimeout(() => {
+    console.log('🚨 Emergency cart check...');
+    const cartItems = document.getElementById('cartItems');
+    if (cartItems && cartItems.innerHTML.includes('Loading')) {
+        console.log('🚨 Cart still loading, forcing display');
+        
+        // Get cart directly from localStorage
+        const cartData = localStorage.getItem('sanherbs_cart') || '[]';
+        const cart = JSON.parse(cartData);
+        
+        if (cart.length > 0) {
+            // Simple emergency cart display
+            const cartHTML = cart.map(item => `
+                <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; background: white;">
+                    <h4>${item.name}</h4>
+                    <p>Price: ₹${item.price} x ${item.quantity}</p>
+                    <p>Total: ₹${(item.price * item.quantity).toFixed(2)}</p>
+                    <button onclick="removeEmergencyItem('${item.id}')" style="background: red; color: white; padding: 8px 15px; border: none; border-radius: 4px;">Remove</button>
+                </div>
+            `).join('');
+            
+            cartItems.innerHTML = cartHTML;
+            console.log('🚨 Emergency cart displayed');
+        } else {
+            cartItems.innerHTML = '<div><h3>Your cart is empty</h3></div>';
+        }
+    }
+}, 3000);
+
+// Emergency remove function
+window.removeEmergencyItem = function(id) {
+    let cart = JSON.parse(localStorage.getItem('sanherbs_cart') || '[]');
+    cart = cart.filter(item => item.id !== id);
+    localStorage.setItem('sanherbs_cart', JSON.stringify(cart));
+    location.reload();
+};
+
 
 
