@@ -114,9 +114,9 @@ function initializeAuth() {
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
     const toggleLink = document.getElementById('toggleLink');
-    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutBtn = document.getElementById('logoutBtn'); // ✅ Add this line
 
-    // Set initial state to LOGIN mode (not signup)
+    // Set initial state to LOGIN mode
     setAuthMode(false);
 
     if (loginBtn) {
@@ -134,10 +134,12 @@ function initializeAuth() {
         });
     }
 
+    // ✅ Add logout button event listener
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
     }
 }
+
 
 // ✅ FIXED Product Ordering - Use Event Delegation
 // Product Ordering Initialization - FIXED WITH EVENT DELEGATION AND POPUP
@@ -996,5 +998,6 @@ function logout() {
 
 // Make logout function globally available
 window.logout = logout;
+
 
 
