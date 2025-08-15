@@ -1,6 +1,6 @@
 // API Configuration for SanHerbs - UPDATED FOR RENDER
 const getAPIBaseURL = () => {
-    // Development
+    // Development - FIXED: Use === instead of =
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return 'http://localhost:3000';
     }
@@ -8,6 +8,7 @@ const getAPIBaseURL = () => {
     return 'https://sanherbs.onrender.com';
 };
 
+// FIXED: Remove escaped underscores
 const API_BASE_URL = getAPIBaseURL();
 
 // Global Variables
@@ -536,7 +537,7 @@ function validateInputs(mobile, password) {
     return true;
 }
 
-// Authentication Functions - ENHANCED FOR SANHERBS
+// Authentication Functions - FIXED RESPONSE FORMAT
 async function login() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -551,10 +552,11 @@ async function login() {
             body: JSON.stringify({ mobile, password })
         });
 
-        if (response.success) {
-            authToken = response.token;
+        // ✅ FIXED: Check for response.data instead of response.success
+        if (response.data && response.data.token) {
+            authToken = response.data.token;
             localStorage.setItem('authToken', authToken);
-            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             
             showMessage("✅ Login successful!", "success");
             updateNavigation();
@@ -572,6 +574,8 @@ async function login() {
                     window.location.href = '/'; // Redirect to home page
                 }
             }, 1000);
+        } else {
+            throw new Error('Invalid login response from server');
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -598,7 +602,8 @@ async function signup() {
             body: JSON.stringify({ mobile, password })
         });
 
-        if (response.success) {
+        // ✅ FIXED: Check for response.data instead of response.success
+        if (response.data && (response.data.message || response.data.user)) {
             showMessage("✅ Account created successfully! You can now login.", "success");
             setTimeout(() => {
                 setAuthMode(false); // Switch to login mode
@@ -611,6 +616,8 @@ async function signup() {
                     document.getElementById("password").value = "";
                 }
             }, 1500);
+        } else {
+            throw new Error('Invalid registration response from server');
         }
     } catch (error) {
         console.error('Signup error:', error);
@@ -637,12 +644,12 @@ function toggleAuthMode() {
     }, 1000);
 }
 
-// NEW: Load user profile data
+// NEW: Load user profile data - FIXED RESPONSE FORMAT
 async function loadUserProfile() {
     try {
         const response = await apiCall('/users/profile');
-        if (response.success) {
-            const user = response.user;
+        if (response.data && response.data.user) {
+            const user = response.data.user;
             localStorage.setItem('user', JSON.stringify(user));
             
             // Update UI with user data
@@ -759,14 +766,14 @@ function checkAuth() {
     }
 }
 
-// NEW: Load products from backend
+// NEW: Load products from backend - FIXED RESPONSE FORMAT
 async function loadProducts() {
     try {
         console.log('Loading products from backend...');
         const response = await apiCall('/products');
         
-        if (response.success && response.products) {
-            renderProducts(response.products);
+        if (response.data && response.data.products) {
+            renderProducts(response.data.products);
         }
     } catch (error) {
         console.log('Could not load products from backend:', error.message);
@@ -819,14 +826,14 @@ function renderProducts(products) {
     initializeProductOrdering();
 }
 
-// NEW: Load plans from backend
+// NEW: Load plans from backend - FIXED RESPONSE FORMAT
 async function loadPlans() {
     try {
         console.log('Loading plans from backend...');
         const response = await apiCall('/plans');
         
-        if (response.success && response.plans) {
-            renderPlans(response.plans);
+        if (response.data && response.data.plans) {
+            renderPlans(response.data.plans);
         }
     } catch (error) {
         console.log('Could not load plans from backend:', error.message);
