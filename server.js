@@ -5,8 +5,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-// Database initialization - FIXED IMPORT
-const database = require('./database/database'); // Import the singleton database instance
+// Database initialization
+const database = require('./database/database');
 
 // Initialize Express app
 const app = express();
@@ -14,14 +14,11 @@ const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(helmet({
-    contentSecurityPolicy: false, // Allow inline scripts for development
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
 }));
 
-// CORS configuration - Updated for your architecture
-// CORS configuration - FIXED for GitHub Pages + Render
-// CORS configuration - FIXED for GitHub Pages + Render
-// CORS configuration - UPDATED FOR SANHERBS
+// CORS configuration - FIXED for SanHerbs
 app.use(cors({
     origin: [
         'https://sanherbs.com',
@@ -32,25 +29,16 @@ app.use(cors({
     credentials: true,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposedHeaders: ['Content-Length', 'X-Requested-With']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Handle preflight OPTIONS requests
 app.options('*', cors());
 
-// Handle preflight OPTIONS requests
-app.options('*', cors());
-
-
-// Handle preflight OPTIONS requests
-app.options('*', cors());
-
-
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200, // Increased limit for better UX
+    windowMs: 15 * 60 * 1000,
+    max: 200,
     message: {
         success: false,
         message: 'Too many requests, please try again later'
@@ -68,9 +56,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Raw body parser for webhooks
 app.use('/api/webhooks', express.raw({ type: 'application/json' }));
 
-// ❌ REMOVED: Static file serving (frontend is on GitHub Pages)
-// app.use(express.static(path.join(__dirname, 'public')));
-
 // Middleware
 const { attachDatabase, requestLogger } = require('./middleware/auth');
 
@@ -87,7 +72,7 @@ async function startServer() {
         await database.init();
         console.log('✅ Database initialized successfully');
 
-        // API Routes
+        // ✅ API Routes MUST come BEFORE any catch-all redirects
         app.use('/api/auth', require('./routes/auth'));
         app.use('/api/products', require('./routes/products'));
         app.use('/api/plans', require('./routes/plans'));
@@ -127,7 +112,7 @@ async function startServer() {
             }
         });
 
-        // ✅ NEW: API-only root endpoint
+        // ✅ API-only root endpoint
         app.get('/', (req, res) => {
             res.json({
                 message: '🌿 SanHerbs API Server',
@@ -139,18 +124,6 @@ async function startServer() {
                     backend: 'Render API Server',
                     database: 'SQLite'
                 },
-                features: [
-                    'User Authentication (JWT)',
-                    'Product Catalog Management', 
-                    'Shopping Cart System',
-                    'Order Management',
-                    'Payment Processing (Razorpay)',
-                    'Delivery Tracking (Shiprocket)',
-                    'Email/SMS Notifications',
-                    'Real-time Order Status',
-                    'Subscription Plans',
-                    'Rate Limiting & Security'
-                ],
                 endpoints: {
                     health: '/api/health',
                     auth: '/api/auth',
@@ -172,18 +145,6 @@ async function startServer() {
                 message: 'Welcome to SanHerbs E-commerce API',
                 version: '1.0.0',
                 website: 'https://sanherbs.com',
-                features: [
-                    'User Authentication (JWT)',
-                    'Product Catalog Management', 
-                    'Shopping Cart System',
-                    'Order Management',
-                    'Payment Processing (Razorpay)',
-                    'Delivery Tracking (Shiprocket)',
-                    'Email/SMS Notifications',
-                    'Real-time Order Status',
-                    'Subscription Plans',
-                    'Rate Limiting & Security'
-                ],
                 endpoints: {
                     auth: '/api/auth',
                     products: '/api/products',
@@ -197,9 +158,6 @@ async function startServer() {
                 }
             });
         });
-
-        // ❌ REMOVED: Static HTML page serving (frontend is on GitHub Pages)
-        // servePage functions and HTML routes removed
 
         // 404 handler for API routes
         app.use('/api/*', (req, res) => {
@@ -221,16 +179,25 @@ async function startServer() {
             });
         });
 
-        // ✅ UPDATED: Redirect non-API requests to main website
+        // ✅ ONLY redirect non-API requests (this MUST come LAST)
         app.use('*', (req, res) => {
-            res.redirect('https://sanherbs.com');
+            // Only redirect if it's NOT an API route
+            if (!req.originalUrl.startsWith('/api/') && !req.originalUrl.startsWith('/auth/')) {
+                console.log(`Redirecting non-API request: ${req.originalUrl}`);
+                res.redirect('https://sanherbs.com');
+            } else {
+                res.status(404).json({
+                    success: false,
+                    message: 'Endpoint not found',
+                    requested_path: req.originalUrl
+                });
+            }
         });
 
         // Global error handler
         app.use((err, req, res, next) => {
             console.error('Global error handler:', err);
             
-            // Handle different types of errors
             if (err.type === 'entity.parse.failed') {
                 return res.status(400).json({
                     success: false,
@@ -252,7 +219,6 @@ async function startServer() {
                 });
             }
 
-            // JWT errors
             if (err.name === 'JsonWebTokenError') {
                 return res.status(401).json({
                     success: false,
@@ -267,7 +233,6 @@ async function startServer() {
                 });
             }
 
-            // Default error response
             res.status(err.status || 500).json({
                 success: false,
                 message: err.message || 'Internal server error',
@@ -312,7 +277,6 @@ async function startServer() {
         process.on('SIGTERM', gracefulShutdown);
         process.on('SIGINT', gracefulShutdown);
 
-        // Handle uncaught exceptions
         process.on('uncaughtException', (err) => {
             console.error('Uncaught Exception:', err);
             process.exit(1);
@@ -336,6 +300,3 @@ async function startServer() {
 startServer();
 
 module.exports = app;
-
-
-
