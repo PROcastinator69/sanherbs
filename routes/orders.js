@@ -2,7 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const razorpayService = require('../services/razorpay');
-const emailService = require('../services/emailService');
+const emailService = require('../services/emailservice');
 const smsService = require('../services/smsService');
 const shiprocketService = require('../services/shiprocket');
 
@@ -349,3 +349,4 @@ router.post('/whatsapp', async (req, res) => {
 });
 
 module.exports = router;
+
