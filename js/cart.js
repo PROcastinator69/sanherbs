@@ -1,4 +1,16 @@
-// Shopping Cart Management
+// API Configuration for SanHerbs backend
+const getAPIBaseURL = () => {
+    // Development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:3000';
+    }
+    // Production - Your actual Render URL
+    return 'https://sanherbs.onrender.com';
+};
+
+const API_BASE_URL = getAPIBaseURL();
+
+// Shopping Cart Management for SanHerbs
 class ShoppingCart {
     constructor() {
         this.cart = this.loadCart();
@@ -9,7 +21,7 @@ class ShoppingCart {
     // Fixed cart loading with validation
     loadCart() {
         try {
-            const cartData = localStorage.getItem('greentap_cart') || localStorage.getItem('cart');
+            const cartData = localStorage.getItem('sanherbs_cart') || localStorage.getItem('greentap_cart') || localStorage.getItem('cart');
             const cart = cartData ? JSON.parse(cartData) : [];
             
             // Validate and clean cart data
@@ -33,6 +45,43 @@ class ShoppingCart {
         this.ensureCartStyling();
         this.updateCartDisplay();
         this.updateCartBadge();
+        
+        // Load fresh product data from backend if available
+        this.syncCartWithBackend();
+    }
+
+    // NEW: Sync cart with backend product data
+    async syncCartWithBackend() {
+        if (this.cart.length === 0) return;
+
+        try {
+            // Get fresh product data from backend
+            const response = await fetch(`${API_BASE_URL}/api/products`);
+            if (response.ok) {
+                const { products } = await response.json();
+                
+                // Update cart items with fresh data
+                this.cart = this.cart.map(cartItem => {
+                    const freshProduct = products.find(p => p.id === cartItem.id);
+                    if (freshProduct) {
+                        return {
+                            ...cartItem,
+                            name: freshProduct.name,
+                            price: freshProduct.price,
+                            image: freshProduct.image,
+                            category: freshProduct.category
+                        };
+                    }
+                    return cartItem;
+                });
+                
+                this.saveCart();
+                this.updateCartDisplay();
+            }
+        } catch (error) {
+            console.error('Error syncing cart with backend:', error);
+            // Continue with cached cart data
+        }
     }
 
     // NEW: Ensure proper cart styling
@@ -106,7 +155,7 @@ class ShoppingCart {
     }
 
     // Add product to cart from marketplace button
-    addToCartFromButton(button) {
+    async addToCartFromButton(button) {
         const productData = {
             id: button.getAttribute('data-product-id') || `product_${Date.now()}`,
             name: button.getAttribute('data-product') || 'Unknown Product',
@@ -121,11 +170,25 @@ class ShoppingCart {
             return;
         }
 
+        // Try to get fresh product data from backend
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
+            if (response.ok) {
+                const { product } = await response.json();
+                productData.name = product.name;
+                productData.price = product.price;
+                productData.image = product.image;
+                productData.category = product.category;
+            }
+        } catch (error) {
+            console.log('Using cached product data:', error.message);
+        }
+
         this.addToCart(productData);
     }
 
     // NEW: Buy Now functionality
-    buyNowFromButton(button) {
+    async buyNowFromButton(button) {
         const productData = {
             id: button.getAttribute('data-product-id') || `product_${Date.now()}`,
             name: button.getAttribute('data-product') || 'Unknown Product',
@@ -138,6 +201,20 @@ class ShoppingCart {
         if (productData.price <= 0) {
             this.showCartNotification('Error: Invalid product price', 'error');
             return;
+        }
+
+        // Try to get fresh product data from backend
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
+            if (response.ok) {
+                const { product } = await response.json();
+                productData.name = product.name;
+                productData.price = product.price;
+                productData.image = product.image;
+                productData.category = product.category;
+            }
+        } catch (error) {
+            console.log('Using cached product data:', error.message);
         }
 
         // Add to cart and redirect to cart page
@@ -158,7 +235,6 @@ class ShoppingCart {
         }
 
         const existingItem = this.cart.find(item => item.id === product.id);
-
         if (existingItem) {
             existingItem.quantity += quantity;
         } else {
@@ -213,7 +289,7 @@ class ShoppingCart {
     // Update quantity directly from input
     updateQuantityDirect(productId, newQuantity) {
         if (newQuantity < 1) return;
-
+        
         const item = this.cart.find(item => item.id === productId);
         if (item) {
             item.quantity = newQuantity;
@@ -235,10 +311,11 @@ class ShoppingCart {
         }
     }
 
-    // Save cart to localStorage
+    // Save cart to localStorage - UPDATED for SanHerbs
     saveCart() {
         try {
-            localStorage.setItem('greentap_cart', JSON.stringify(this.cart));
+            localStorage.setItem('sanherbs_cart', JSON.stringify(this.cart));
+            localStorage.setItem('greentap_cart', JSON.stringify(this.cart)); // Backward compatibility
             localStorage.setItem('cart', JSON.stringify(this.cart)); // Backup
         } catch (error) {
             console.error('Error saving cart:', error);
@@ -453,10 +530,20 @@ class ShoppingCart {
         document.body.appendChild(notification);
     }
 
-    // Proceed to checkout
+    // Proceed to checkout - UPDATED for SanHerbs
     proceedToCheckout() {
         if (this.cart.length === 0) {
             this.showCartNotification('Your cart is empty!', 'error');
+            return;
+        }
+
+        // Check authentication status
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            this.showCartNotification('Please login to proceed to checkout', 'error');
+            setTimeout(() => {
+                window.location.href = '/login.html?redirect=checkout';
+            }, 1500);
             return;
         }
 
@@ -501,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Only initialize cart on cart page or if cart elements exist
         if (document.getElementById('cartItems') || document.querySelector('.cart-count')) {
             window.shoppingCart = new ShoppingCart();
-            console.log('✅ Shopping cart initialized successfully');
+            console.log('✅ SanHerbs shopping cart initialized successfully');
         }
     } catch (error) {
         console.error('❌ Error initializing shopping cart:', error);
