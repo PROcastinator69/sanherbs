@@ -8,7 +8,6 @@ const getAPIBaseURL = () => {
     return 'https://sanherbs.onrender.com';
 };
 
-// FIXED: Remove escaped underscores
 const API_BASE_URL = getAPIBaseURL();
 
 // Global Variables
@@ -537,7 +536,7 @@ function validateInputs(mobile, password) {
     return true;
 }
 
-// Authentication Functions - FIXED RESPONSE FORMAT
+// Authentication Functions - FIXED FOR 302 REDIRECTS
 async function login() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -554,7 +553,7 @@ async function login() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ mobile, password }),
-            redirect: 'manual'  // This prevents automatic redirect following
+            redirect: 'manual'
         });
 
         console.log('Login response status:', response.status);
@@ -567,7 +566,6 @@ async function login() {
             if (location) {
                 showMessage("✅ Login successful! Redirecting...", "success");
                 
-                // Extract user info if available in headers or handle redirect
                 setTimeout(() => {
                     window.location.href = location;
                 }, 1000);
@@ -619,6 +617,7 @@ async function login() {
     }
 }
 
+// FIXED SIGNUP FUNCTION - DEBUG VERSION
 async function signup() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -628,18 +627,44 @@ async function signup() {
     try {
         showMessage("Creating account...", "success");
         
-        const response = await apiCall('/auth/register', {
+        // Use manual redirect handling like login
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
-            body: JSON.stringify({ mobile, password })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mobile, password }),
+            redirect: 'manual'
         });
 
-        // ✅ FIXED: Check for response.data instead of response.success
-        if (response.data && (response.data.message || response.data.user)) {
+        console.log('🔍 Signup response status:', response.status);
+
+        // Handle 302 redirect (success)
+        if (response.status === 302) {
+            console.log('🔍 Signup 302 redirect detected');
             showMessage("✅ Account created successfully! You can now login.", "success");
             setTimeout(() => {
                 setAuthMode(false); // Switch to login mode
                 
-                // Keep mobile number, clear password
+                if (document.getElementById("mobile")) {
+                    document.getElementById("mobile").value = mobile;
+                }
+                if (document.getElementById("password")) {
+                    document.getElementById("password").value = "";
+                }
+            }, 1500);
+            return;
+        }
+
+        // Handle 200 OK response
+        if (response.ok) {
+            const data = await response.json();
+            console.log('🔍 Signup response data:', data);
+            
+            showMessage("✅ Account created successfully! You can now login.", "success");
+            setTimeout(() => {
+                setAuthMode(false);
+                
                 if (document.getElementById("mobile")) {
                     document.getElementById("mobile").value = mobile;
                 }
@@ -648,13 +673,17 @@ async function signup() {
                 }
             }, 1500);
         } else {
-            throw new Error('Invalid registration response from server');
+            // Log the error response for debugging
+            const errorText = await response.text();
+            console.error('🔍 Signup error response:', response.status, errorText);
+            throw new Error(`Registration failed with status: ${response.status} - ${errorText}`);
         }
+
     } catch (error) {
         console.error('Signup error:', error);
         
-        if (error.message.includes('Cannot connect to server')) {
-            showMessage(`❌ ${error.message}. Backend URL: ${API_BASE_URL}`, "error");
+        if (error.message.includes('Failed to fetch')) {
+            showMessage(`❌ Cannot connect to server. Backend URL: ${API_BASE_URL}`, "error");
         } else {
             showMessage(`❌ ${error.message}`, "error");
         }
@@ -906,4 +935,3 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
-
