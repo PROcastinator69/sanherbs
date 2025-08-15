@@ -255,84 +255,87 @@ class ShoppingCart {
     }
 
     // Update cart display on cart page - ENHANCED VERSION
-    updateCartDisplay() {
-        const cartContainer = document.getElementById('cartItems');
-        const emptyCartMessage = document.getElementById('emptyCartMessage');
-        
-        if (!cartContainer) return;
-
-        // Force proper styling application
-        this.ensureCartStyling();
-
-        if (this.cart.length === 0) {
-            cartContainer.innerHTML = `
-                <div class="cart-loading" style="display: none;"></div>
-            `;
-            
-            if (emptyCartMessage) {
-                emptyCartMessage.style.display = 'block';
-            }
-            
-            this.updateCartSummary(0, 0);
-            return;
-        }
-
-        // Hide empty cart message
-        if (emptyCartMessage) {
-            emptyCartMessage.style.display = 'none';
-        }
-
-        // Display cart items with improved styling
-        cartContainer.innerHTML = this.cart.map(item => {
-            const price = parseFloat(item.price) || 0;
-            const quantity = parseInt(item.quantity) || 1;
-            const total = price * quantity;
-            
-            return `
-                <div class="cart-item" data-product-id="${item.id}">
-                    <div class="cart-item-image">
-                        ${item.image && item.image !== '/images/products/default.jpg' ? 
-                            `<img src="${item.image}" alt="${item.name}" loading="lazy">` : 
-                            '💊'
-                        }
-                    </div>
-                    
-                    <div class="cart-item-details">
-                        <h4>${item.name}</h4>
-                        <div class="cart-item-price">₹${price.toFixed(2)} each</div>
-                        <div class="cart-item-category">${item.category}</div>
-                    </div>
-                    
-                    <div class="cart-item-quantity">
-                        <button class="quantity-btn" data-product-id="${item.id}" data-action="decrease" title="Decrease quantity">-</button>
-                        <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-product-id="${item.id}" title="Quantity">
-                        <button class="quantity-btn" data-product-id="${item.id}" data-action="increase" title="Increase quantity">+</button>
-                    </div>
-                    
-                    <div class="cart-item-total">
-                        <div class="item-total">₹${total.toFixed(2)}</div>
-                        <button class="remove-item-btn" data-product-id="${item.id}" title="Remove item">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        const subtotal = this.getCartTotal();
-        const itemCount = this.getCartItemCount();
-        this.updateCartSummary(subtotal, itemCount);
-
-        // Force style recalculation after DOM update
-        setTimeout(() => {
-            const cartItems = document.querySelectorAll('.cart-item');
-            cartItems.forEach(item => {
-                item.style.opacity = '0';
-                item.offsetHeight; // Force reflow
-                item.style.opacity = '1';
-            });
-        }, 10);
+   // Update cart display on cart page - FIXED VERSION
+updateCartDisplay() {
+    const cartContainer = document.getElementById('cartItems');
+    const emptyCartMessage = document.getElementById('emptyCartMessage');
+    
+    console.log('Updating cart display, cart length:', this.cart.length);
+    console.log('Cart container found:', !!cartContainer);
+    
+    if (!cartContainer) {
+        console.error('Cart container #cartItems not found in DOM');
+        return;
     }
+
+    if (this.cart.length === 0) {
+        cartContainer.innerHTML = `
+            <div class="empty-cart-message">
+                <h3>Your cart is empty</h3>
+                <p>Add some products to get started</p>
+                <a href="/marketplace.html" class="btn btn-primary">Shop Now</a>
+            </div>
+        `;
+        
+        if (emptyCartMessage) {
+            emptyCartMessage.style.display = 'block';
+        }
+        
+        this.updateCartSummary(0, 0);
+        return;
+    }
+
+    // Hide empty cart message
+    if (emptyCartMessage) {
+        emptyCartMessage.style.display = 'none';
+    }
+
+    // Display cart items
+    const cartHTML = this.cart.map(item => {
+        const price = parseFloat(item.price) || 0;
+        const quantity = parseInt(item.quantity) || 1;
+        const total = price * quantity;
+        
+        return `
+            <div class="cart-item" data-product-id="${item.id}">
+                <div class="cart-item-image">
+                    ${item.image && item.image !== '/images/products/default.jpg' ? 
+                        `<img src="${item.image}" alt="${item.name}" loading="lazy">` : 
+                        '<div class="product-icon">💊</div>'
+                    }
+                </div>
+                
+                <div class="cart-item-details">
+                    <h4>${item.name}</h4>
+                    <div class="cart-item-price">₹${price.toFixed(2)} each</div>
+                    <div class="cart-item-category">${item.category}</div>
+                </div>
+                
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" data-product-id="${item.id}" data-action="decrease">-</button>
+                    <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-product-id="${item.id}">
+                    <button class="quantity-btn" data-product-id="${item.id}" data-action="increase">+</button>
+                </div>
+                
+                <div class="cart-item-total">
+                    <div class="item-total">₹${total.toFixed(2)}</div>
+                    <button class="remove-item-btn" data-product-id="${item.id}">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    cartContainer.innerHTML = cartHTML;
+
+    const subtotal = this.getCartTotal();
+    const itemCount = this.getCartItemCount();
+    this.updateCartSummary(subtotal, itemCount);
+    
+    console.log('Cart display updated successfully');
+}
+
 
     // Update cart summary - ENHANCED VERSION
     updateCartSummary(subtotal, itemCount) {
@@ -504,3 +507,4 @@ window.ShoppingCart = ShoppingCart;
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShoppingCart;
 }
+
