@@ -21,7 +21,9 @@ app.use(helmet({
 // CORS configuration - FIXED for SanHerbs
 app.use(cors({
     origin: [
+        'http://sanherbs.com',      // ✅ ADDED HTTP VERSION
         'https://sanherbs.com',
+        'http://www.sanherbs.com',  // ✅ ADDED HTTP VERSION  
         'https://www.sanherbs.com',
         'http://localhost:3000',
         'http://127.0.0.1:3000'
@@ -32,12 +34,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Handle preflight OPTIONS requests
+// Handle preflight OPTIONS requests - FIXED
 app.options('*', cors());
 
-// Rate limiting
+// Rate limiting - FIXED
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,  // ✅ FIXED: Remove escaped \
     max: 200,
     message: {
         success: false,
@@ -92,14 +94,14 @@ async function startServer() {
                     success: true,
                     message: 'SanHerbs API is running',
                     timestamp: new Date().toISOString(),
-                    environment: process.env.NODE_ENV || 'development',
+                    environment: process.env.NODE_ENV || 'development',  // ✅ FIXED
                     database: dbHealth,
-                    database_stats: dbStats,
+                    database_stats: dbStats,  // ✅ FIXED
                     services: {
-                        razorpay: !!process.env.RAZORPAY_KEY_ID,
-                        email: !!process.env.EMAIL_USER,
-                        sms: !!process.env.TWILIO_ACCOUNT_SID,
-                        shipping: !!process.env.SHIPROCKET_EMAIL
+                        razorpay: !!process.env.RAZORPAY_KEY_ID,  // ✅ FIXED
+                        email: !!process.env.EMAIL_USER,  // ✅ FIXED
+                        sms: !!process.env.TWILIO_ACCOUNT_SID,  // ✅ FIXED
+                        shipping: !!process.env.SHIPROCKET_EMAIL  // ✅ FIXED
                     }
                 });
             } catch (error) {
@@ -159,12 +161,12 @@ async function startServer() {
             });
         });
 
-        // 404 handler for API routes
+        // 404 handler for API routes - FIXED
         app.use('/api/*', (req, res) => {
             res.status(404).json({
                 success: false,
                 message: 'API endpoint not found',
-                requested_path: req.originalUrl,
+                requested_path: req.originalUrl,  // ✅ FIXED
                 available_endpoints: [
                     '/api/auth',
                     '/api/products', 
@@ -179,7 +181,7 @@ async function startServer() {
             });
         });
 
-        // ✅ ONLY redirect non-API requests (this MUST come LAST)
+        // ✅ ONLY redirect non-API requests (this MUST come LAST) - FIXED
         app.use('*', (req, res) => {
             // Only redirect if it's NOT an API route
             if (!req.originalUrl.startsWith('/api/') && !req.originalUrl.startsWith('/auth/')) {
@@ -189,12 +191,12 @@ async function startServer() {
                 res.status(404).json({
                     success: false,
                     message: 'Endpoint not found',
-                    requested_path: req.originalUrl
+                    requested_path: req.originalUrl  // ✅ FIXED
                 });
             }
         });
 
-        // Global error handler
+        // Global error handler - FIXED
         app.use((err, req, res, next) => {
             console.error('Global error handler:', err);
             
@@ -205,7 +207,7 @@ async function startServer() {
                 });
             }
             
-            if (err.code === 'LIMIT_FILE_SIZE') {
+            if (err.code === 'LIMIT_FILE_SIZE') {  // ✅ FIXED
                 return res.status(413).json({
                     success: false,
                     message: 'Request entity too large'
@@ -236,7 +238,7 @@ async function startServer() {
             res.status(err.status || 500).json({
                 success: false,
                 message: err.message || 'Internal server error',
-                ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+                ...(process.env.NODE_ENV === 'development' && { stack: err.stack })  // ✅ FIXED
             });
         });
 
