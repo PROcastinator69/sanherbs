@@ -547,41 +547,72 @@ async function login() {
     try {
         showMessage("Logging in...", "success");
         
-        const response = await apiCall('/auth/login', {
+        // Use redirect: 'manual' to prevent automatic redirect following
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
-            body: JSON.stringify({ mobile, password })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mobile, password }),
+            redirect: 'manual'  // This prevents automatic redirect following
         });
 
-        // ✅ FIXED: Check for response.data instead of response.success
-        if (response.data && response.data.token) {
-            authToken = response.data.token;
-            localStorage.setItem('authToken', authToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+        console.log('Login response status:', response.status);
+
+        // Handle 302 redirect response
+        if (response.status === 302) {
+            const location = response.headers.get('Location');
+            console.log('Redirect location:', location);
             
-            showMessage("✅ Login successful!", "success");
-            updateNavigation();
-            
-            // Check for redirect parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirect = urlParams.get('redirect');
-            
-            setTimeout(() => {
-                if (redirect === 'checkout') {
-                    window.location.href = '/checkout.html';
-                } else if (redirect === 'plans') {
-                    window.location.href = '/plans.html';
-                } else {
-                    window.location.href = '/'; // Redirect to home page
-                }
-            }, 1000);
-        } else {
-            throw new Error('Invalid login response from server');
+            if (location) {
+                showMessage("✅ Login successful! Redirecting...", "success");
+                
+                // Extract user info if available in headers or handle redirect
+                setTimeout(() => {
+                    window.location.href = location;
+                }, 1000);
+                return;
+            } else {
+                throw new Error('Redirect location header missing');
+            }
         }
+
+        // Handle normal 200 OK response
+        if (response.ok) {
+            const data = await response.json();
+            
+            if (data.data && data.data.token) {
+                authToken = data.data.token;
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('user', JSON.stringify(data.data.user));
+                
+                showMessage("✅ Login successful!", "success");
+                updateNavigation();
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirect = urlParams.get('redirect');
+                
+                setTimeout(() => {
+                    if (redirect === 'checkout') {
+                        window.location.href = '/checkout.html';
+                    } else if (redirect === 'plans') {
+                        window.location.href = '/plans.html';
+                    } else {
+                        window.location.href = '/';
+                    }
+                }, 1000);
+            } else {
+                throw new Error('Invalid login response format');
+            }
+        } else {
+            throw new Error(`Login failed with status: ${response.status}`);
+        }
+
     } catch (error) {
         console.error('Login error:', error);
         
-        if (error.message.includes('Cannot connect to server')) {
-            showMessage(`❌ ${error.message}. Backend URL: ${API_BASE_URL}`, "error");
+        if (error.message.includes('Failed to fetch')) {
+            showMessage(`❌ Cannot connect to server. Backend URL: ${API_BASE_URL}`, "error");
         } else {
             showMessage(`❌ ${error.message}`, "error");
         }
@@ -875,3 +906,4 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
+
