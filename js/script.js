@@ -139,27 +139,26 @@ function initializeAuth() {
     }
 }
 
-// Product Ordering Initialization - ENHANCED FOR SANHERBS
+// ✅ FIXED Product Ordering - Use Event Delegation
 function initializeProductOrdering() {
-    const productButtons = document.querySelectorAll('.add-to-cart-btn');
-    const buyNowButtons = document.querySelectorAll('.buy-now-btn');
-
-    productButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Add to cart clicked');
+    // Remove direct event listeners and use event delegation instead
+    document.addEventListener('click', function(event) {
+        // Handle Add to Cart buttons
+        if (event.target.closest('.add-to-cart-btn')) {
+            event.preventDefault();
+            const btn = event.target.closest('.add-to-cart-btn');
             
-            const productName = this.getAttribute('data-product');
-            const price = this.getAttribute('data-price');
-            const productId = this.getAttribute('data-product-id');
-            const image = this.getAttribute('data-image');
-            const category = this.getAttribute('data-category');
+            const productName = btn.getAttribute('data-product');
+            const price = btn.getAttribute('data-price');
+            const productId = btn.getAttribute('data-product-id');
+            const image = btn.getAttribute('data-image');
+            const category = btn.getAttribute('data-category');
             
-            console.log('Product data:', { productName, price, productId, image, category });
+            console.log('Add to cart clicked:', { productName, price, productId });
             
             if (productName && price) {
                 addToCart({
-                    id: productId,
+                    id: productId || `product_${Date.now()}`,
                     name: productName, 
                     price: price,
                     image: image,
@@ -169,25 +168,24 @@ function initializeProductOrdering() {
                 console.error('Missing product data');
                 showMessage("❌ Product information missing", "error");
             }
-        });
-    });
-
-    buyNowButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Buy now clicked');
+        }
+        
+        // Handle Buy Now buttons
+        if (event.target.closest('.buy-now-btn')) {
+            event.preventDefault();
+            const btn = event.target.closest('.buy-now-btn');
             
-            const productName = this.getAttribute('data-product');
-            const price = this.getAttribute('data-price');
-            const productId = this.getAttribute('data-product-id');
-            const image = this.getAttribute('data-image');
-            const category = this.getAttribute('data-category');
+            const productName = btn.getAttribute('data-product');
+            const price = btn.getAttribute('data-price');
+            const productId = btn.getAttribute('data-product-id');
+            const image = btn.getAttribute('data-image');
+            const category = btn.getAttribute('data-category');
             
-            console.log('Buy now data:', { productName, price, productId });
+            console.log('Buy now clicked:', { productName, price, productId });
             
             if (productName && price) {
                 buyNow({
-                    id: productId,
+                    id: productId || `product_${Date.now()}`,
                     name: productName,
                     price: price,
                     image: image,
@@ -197,7 +195,7 @@ function initializeProductOrdering() {
                 console.error('Missing product data');
                 showMessage("❌ Product information missing", "error");
             }
-        });
+        }
     });
 }
 
@@ -855,9 +853,6 @@ function renderProducts(products) {
     `).join('');
     
     productsContainer.innerHTML = productHTML;
-    
-    // Reinitialize product ordering after rendering
-    initializeProductOrdering();
 }
 
 // NEW: Load plans from backend
@@ -899,9 +894,6 @@ function renderPlans(plans) {
     `).join('');
     
     plansContainer.innerHTML = planHTML;
-    
-    // Reinitialize plan subscription after rendering
-    initializePlanSubscription();
 }
 
 // Expose functions globally for onclick handlers
