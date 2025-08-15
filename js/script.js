@@ -952,4 +952,49 @@ function showPopupNotification(message) {
         }, 300);
     }, 3000);
 }
+// Logout Function for SanHerbs
+function logout() {
+    // Clear all authentication and user data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('sanherbs_cart');
+    localStorage.removeItem('greentap_cart');
+    localStorage.removeItem('cart');
+    
+    // Reset global auth variable
+    authToken = null;
+    
+    // Update navigation to show login button
+    updateNavigation();
+    updateCartCount();
+    
+    // Clear any auth sections
+    const authSection = document.querySelector(".auth-section");
+    const mainSection = document.getElementById("main-section");
+    
+    if (authSection) authSection.style.display = "block";
+    if (mainSection) mainSection.style.display = "none";
+    
+    // Clear login form inputs
+    const mobileInput = document.getElementById("mobile");
+    const passwordInput = document.getElementById("password");
+    
+    if (mobileInput) mobileInput.value = "";
+    if (passwordInput) passwordInput.value = "";
+    
+    // Clear any messages
+    clearMessage();
+    
+    // Show logout success message
+    showMessage("✅ Logged out successfully!", "success");
+    
+    // Redirect to home page after delay
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 1500);
+}
+
+// Make logout function globally available
+window.logout = logout;
+
 
