@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const razorpayService = require('../services/razorpay');
-const emailService = require('../services/emailService');
-const smsService = require('../services/smsService');
+const emailService = require('../services/emailservice');
+const smsService = require('../services/smsservice');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 
@@ -349,3 +349,4 @@ router.get('/order/:orderId', authenticateToken, async (req, res) => {
 });
 
 module.exports = router;
+
