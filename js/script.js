@@ -252,24 +252,35 @@ function initializeNavigation() {
 }
 
 // NEW: Update navigation based on authentication status
+// NEW: Update navigation based on authentication status
 function updateNavigation() {
-    const loginNavItem = document.querySelector('a[href*="login"]');
-    const logoutBtn = document.getElementById('logoutBtn'); // ✅ Add this
-    const profileNavItem = document.querySelector('a[href*="profile"]');
-    const ordersNavItem = document.querySelector('a[href*="orders"]');
+    const loginNavItem = document.querySelector('.login-nav');
+    const logoutNavItem = document.querySelector('.logout-nav');
+    
+    console.log('🔍 Auth token:', !!authToken);
+    console.log('🔍 Login nav found:', !!loginNavItem);
+    console.log('🔍 Logout nav found:', !!logoutNavItem);
     
     if (authToken) {
-        // User is logged in
-        if (loginNavItem) loginNavItem.style.display = 'none';
-        if (logoutBtn) logoutBtn.style.display = 'block'; // ✅ Show logout
-        if (profileNavItem) profileNavItem.style.display = 'block';
-        if (ordersNavItem) ordersNavItem.style.display = 'block';
+        // User is logged in - hide login, show logout
+        if (loginNavItem) {
+            loginNavItem.style.display = 'none';
+            console.log('✅ Login button hidden');
+        }
+        if (logoutNavItem) {
+            logoutNavItem.style.display = 'block';
+            console.log('✅ Logout button shown');
+        }
     } else {
-        // User is not logged in
-        if (loginNavItem) loginNavItem.style.display = 'block';
-        if (logoutBtn) logoutBtn.style.display = 'none'; // ✅ Hide logout
-        if (profileNavItem) profileNavItem.style.display = 'none';
-        if (ordersNavItem) ordersNavItem.style.display = 'none';
+        // User is NOT logged in - show login, hide logout  
+        if (loginNavItem) {
+            loginNavItem.style.display = 'block';
+            console.log('✅ Login button shown');
+        }
+        if (logoutNavItem) {
+            logoutNavItem.style.display = 'none';
+            console.log('✅ Logout button hidden');
+        }
     }
 }
 
@@ -1002,6 +1013,7 @@ function logout() {
 
 // Make logout function globally available
 window.logout = logout;
+
 
 
 
