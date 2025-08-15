@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const razorpayService = require('../services/razorpay');
 const emailService = require('../services/emailservice');
-const smsService = require('../services/smsService');
+const smsService = require('../services/smsservice');
 const shiprocketService = require('../services/shiprocket');
 
 // Middleware to verify JWT token (your existing middleware)
@@ -349,4 +349,5 @@ router.post('/whatsapp', async (req, res) => {
 });
 
 module.exports = router;
+
 
