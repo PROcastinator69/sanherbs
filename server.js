@@ -20,6 +20,7 @@ app.use(helmet({
 
 // CORS configuration - Updated for your architecture
 // CORS configuration - FIXED for GitHub Pages + Render
+// CORS configuration - FIXED for GitHub Pages + Render
 app.use(cors({
     origin: [
         'https://sanherbs.com',
@@ -32,6 +33,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight OPTIONS requests
+app.options('*', cors());
+
 
 // Handle preflight OPTIONS requests
 app.options('*', cors());
@@ -326,4 +331,5 @@ async function startServer() {
 startServer();
 
 module.exports = app;
+
 
