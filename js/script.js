@@ -615,36 +615,16 @@ async function signup() {
     try {
         showMessage("Creating account...", "success");
         
-        // Use manual redirect handling like login
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ mobile, password }),
-            redirect: 'manual'
+            body: JSON.stringify({ mobile, password })
         });
 
         console.log('🔍 Signup response status:', response.status);
 
-        // Handle 302 redirect (success)
-        if (response.status === 302) {
-            console.log('🔍 Signup 302 redirect detected');
-            showMessage("✅ Account created successfully! You can now login.", "success");
-            setTimeout(() => {
-                setAuthMode(false); // Switch to login mode
-                
-                if (document.getElementById("mobile")) {
-                    document.getElementById("mobile").value = mobile;
-                }
-                if (document.getElementById("password")) {
-                    document.getElementById("password").value = "";
-                }
-            }, 1500);
-            return;
-        }
-
-        // Handle 200 OK response
         if (response.ok) {
             const data = await response.json();
             console.log('🔍 Signup response data:', data);
@@ -661,7 +641,6 @@ async function signup() {
                 }
             }, 1500);
         } else {
-            // Log the error response for debugging
             const errorText = await response.text();
             console.error('🔍 Signup error response:', response.status, errorText);
             throw new Error(`Registration failed with status: ${response.status} - ${errorText}`);
@@ -670,27 +649,14 @@ async function signup() {
     } catch (error) {
         console.error('Signup error:', error);
         
-        if (error.message.includes('Failed to fetch')) {
-            showMessage(`❌ Cannot connect to server. Backend URL: ${API_BASE_URL}`, "error");
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            showMessage("❌ Cannot connect to server. Please check your backend CORS configuration. Backend URL: " + API_BASE_URL, "error");
         } else {
-            showMessage(`❌ ${error.message}`, "error");
+            showMessage("❌ " + error.message, "error");
         }
     }
 }
 
-function toggleAuthMode() {
-    setAuthMode(!isSignupMode);
-    
-    const mobileInput = document.getElementById("mobile");
-    const passwordInput = document.getElementById("password");
-    
-    if (mobileInput) mobileInput.value = "";
-    if (passwordInput) passwordInput.value = "";
-    
-    setTimeout(() => {
-        clearMessage();
-    }, 1000);
-}
 
 // NEW: Load user profile data - FIXED RESPONSE FORMAT
 async function loadUserProfile() {
@@ -923,4 +889,5 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
+
 
