@@ -8,6 +8,7 @@ const getAPIBaseURL = () => {
     return 'https://sanherbs.onrender.com';
 };
 
+// FIXED: Remove escaped underscores
 const API_BASE_URL = getAPIBaseURL();
 
 // Global Variables
@@ -51,31 +52,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Authentication Initialization - FIXED VERSION
-function initializeAuth() {
-    const loginBtn = document.getElementById('loginBtn');
-    const signupBtn = document.getElementById('signupBtn');
-    const toggleLink = document.getElementById('toggleLink');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Set initial state to LOGIN mode (not signup)
-    setAuthMode(false);
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', login);
-    }
-
-    if (signupBtn) {
-        signupBtn.addEventListener('click', signup);
-    }
-
-    if (toggleLink) {
-        toggleLink.addEventListener('click', toggleAuthMode);
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
-    }
+// FIXED FUNCTION ORDER: toggleAuthMode BEFORE setAuthMode
+function toggleAuthMode() {
+    setAuthMode(!isSignupMode);
+    
+    const mobileInput = document.getElementById("mobile");
+    const passwordInput = document.getElementById("password");
+    
+    if (mobileInput) mobileInput.value = "";
+    if (passwordInput) passwordInput.value = "";
+    
+    setTimeout(() => {
+        clearMessage();
+    }, 1000);
 }
 
 // NEW: Set Authentication Mode Function - FIXED ESCAPING
@@ -111,10 +100,43 @@ function setAuthMode(isSignup) {
     // Re-attach event listener to the new toggleLink
     const newToggleLink = document.getElementById("toggleLink");
     if (newToggleLink) {
-        newToggleLink.addEventListener('click', toggleAuthMode);
+        newToggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleAuthMode();
+        });
     }
 
     clearMessage();
+}
+
+// Authentication Initialization - FIXED VERSION
+function initializeAuth() {
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Set initial state to LOGIN mode (not signup)
+    setAuthMode(false);
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', login);
+    }
+
+    if (signupBtn) {
+        signupBtn.addEventListener('click', signup);
+    }
+
+    if (toggleLink) {
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleAuthMode();
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
 }
 
 // Product Ordering Initialization - ENHANCED FOR SANHERBS
@@ -536,7 +558,7 @@ function validateInputs(mobile, password) {
     return true;
 }
 
-// Authentication Functions - FIXED FOR 302 REDIRECTS
+// Authentication Functions - FIXED FOR BACKEND RESPONSE FORMAT
 async function login() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -546,8 +568,7 @@ async function login() {
     try {
         showMessage("Logging in...", "success");
         
-        // Use regular fetch without manual redirect handling
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -561,14 +582,11 @@ async function login() {
             const data = await response.json();
             console.log('Login response data:', data);
             
-            // Handle both response formats
-            const token = data.token || data.data?.token;
-            const user = data.user || data.data?.user;
-            
-            if (token) {
-                authToken = token;
+            // ✅ FIXED: Check for success property directly (matches backend format)
+            if (data.success && data.token) {
+                authToken = data.token;
                 localStorage.setItem('authToken', authToken);
-                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('user', JSON.stringify(data.user));
                 
                 showMessage("✅ Login successful!", "success");
                 updateNavigation();
@@ -586,7 +604,7 @@ async function login() {
                     }
                 }, 1000);
             } else {
-                throw new Error('Invalid login response - no token received');
+                throw new Error(data.message || 'Invalid login response - no token received');
             }
         } else {
             const errorData = await response.json();
@@ -597,15 +615,14 @@ async function login() {
         console.error('Login error:', error);
         
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-            showMessage(`❌ Cannot connect to server. Please check CORS configuration. Backend: ${API_BASE_URL}`, "error");
+            showMessage(`❌ Cannot connect to server. Backend: ${API_BASE_URL}`, "error");
         } else {
             showMessage(`❌ ${error.message}`, "error");
         }
     }
 }
 
-
-// FIXED SIGNUP FUNCTION - DEBUG VERSION
+// FIXED SIGNUP FUNCTION - MATCHES BACKEND RESPONSE FORMAT
 async function signup() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -615,7 +632,7 @@ async function signup() {
     try {
         showMessage("Creating account...", "success");
         
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -629,41 +646,44 @@ async function signup() {
             const data = await response.json();
             console.log('🔍 Signup response data:', data);
             
-            showMessage("✅ Account created successfully! You can now login.", "success");
-            setTimeout(() => {
-                setAuthMode(false);
-                
-                if (document.getElementById("mobile")) {
-                    document.getElementById("mobile").value = mobile;
-                }
-                if (document.getElementById("password")) {
-                    document.getElementById("password").value = "";
-                }
-            }, 1500);
+            // ✅ FIXED: Check for success property directly (matches backend format)
+            if (data.success) {
+                showMessage("✅ " + data.message, "success");
+                setTimeout(() => {
+                    setAuthMode(false); // Switch to login mode
+                    
+                    if (document.getElementById("mobile")) {
+                        document.getElementById("mobile").value = mobile;
+                    }
+                    if (document.getElementById("password")) {
+                        document.getElementById("password").value = "";
+                    }
+                }, 1500);
+            } else {
+                throw new Error(data.message || 'Registration failed');
+            }
         } else {
-            const errorText = await response.text();
-            console.error('🔍 Signup error response:', response.status, errorText);
-            throw new Error(`Registration failed with status: ${response.status} - ${errorText}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Registration failed with status: ${response.status}`);
         }
 
     } catch (error) {
         console.error('Signup error:', error);
         
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-            showMessage("❌ Cannot connect to server. Please check your backend CORS configuration. Backend URL: " + API_BASE_URL, "error");
+            showMessage("❌ Cannot connect to server. Backend URL: " + API_BASE_URL, "error");
         } else {
             showMessage("❌ " + error.message, "error");
         }
     }
 }
 
-
-// NEW: Load user profile data - FIXED RESPONSE FORMAT
+// NEW: Load user profile data
 async function loadUserProfile() {
     try {
-        const response = await apiCall('/users/profile');
-        if (response.data && response.data.user) {
-            const user = response.data.user;
+        const response = await apiCall('/api/users/profile');
+        if (response.success && response.user) {
+            const user = response.user;
             localStorage.setItem('user', JSON.stringify(user));
             
             // Update UI with user data
@@ -780,14 +800,14 @@ function checkAuth() {
     }
 }
 
-// NEW: Load products from backend - FIXED RESPONSE FORMAT
+// NEW: Load products from backend
 async function loadProducts() {
     try {
         console.log('Loading products from backend...');
-        const response = await apiCall('/products');
+        const response = await apiCall('/api/products');
         
-        if (response.data && response.data.products) {
-            renderProducts(response.data.products);
+        if (response.success && response.products) {
+            renderProducts(response.products);
         }
     } catch (error) {
         console.log('Could not load products from backend:', error.message);
@@ -840,14 +860,14 @@ function renderProducts(products) {
     initializeProductOrdering();
 }
 
-// NEW: Load plans from backend - FIXED RESPONSE FORMAT
+// NEW: Load plans from backend
 async function loadPlans() {
     try {
         console.log('Loading plans from backend...');
-        const response = await apiCall('/plans');
+        const response = await apiCall('/api/plans');
         
-        if (response.data && response.data.plans) {
-            renderPlans(response.data.plans);
+        if (response.success && response.plans) {
+            renderPlans(response.plans);
         }
     } catch (error) {
         console.log('Could not load plans from backend:', error.message);
@@ -889,5 +909,3 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
-
-
