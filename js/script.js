@@ -1,8 +1,24 @@
+// API Configuration for SanHerbs - UPDATED FOR RENDER
+const getAPIBaseURL = () => {
+    // Development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:3000';
+    }
+    // Production - Your actual Render URL
+    return 'https://sanherbs.onrender.com';
+};
+
+const API_BASE_URL = getAPIBaseURL();
+
 // Global Variables
 let isSignupMode = false;
+let authToken = localStorage.getItem('authToken');
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🌿 SanHerbs application initializing...');
+    console.log('🔗 API Base URL:', API_BASE_URL);
+    
     initializeNavigation();
     initializeAuth();
     initializeFilters();
@@ -10,23 +26,28 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAnimations();
     initializeProductOrdering();
     initializePlanSubscription();
-
+    
     // Update cart count on page load
     updateCartCount();
-
-    // Check if user is already logged in
+    
+    // Check if user is already logged in - FIXED COMPARISON
     if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
         checkAuth();
     }
-
-    // Load products if on marketplace page
+    
+    // Load products if on marketplace page - FIXED COMPARISON
     if (window.location.pathname === '/marketplace' || window.location.pathname === '/marketplace.html') {
         loadProducts();
     }
-
-    // Load plans if on plans page
+    
+    // Load plans if on plans page - FIXED COMPARISON
     if (window.location.pathname === '/plans' || window.location.pathname === '/plans.html') {
         loadPlans();
+    }
+
+    // Load user profile if authenticated
+    if (authToken) {
+        loadUserProfile();
     }
 });
 
@@ -70,7 +91,7 @@ function setAuthMode(isSignup) {
     if (isSignupMode) {
         // SIGNUP MODE
         if (authTitle) authTitle.textContent = "Create Account";
-        if (authSubtitle) authSubtitle.textContent = "Join GreenTap Health today";
+        if (authSubtitle) authSubtitle.textContent = "Join SanHerbs today";
         if (loginBtn) loginBtn.style.display = "none";
         if (signupBtn) signupBtn.style.display = "block";
         if (toggleText) {
@@ -79,11 +100,11 @@ function setAuthMode(isSignup) {
     } else {
         // LOGIN MODE (Default)
         if (authTitle) authTitle.textContent = "Welcome Back";
-        if (authSubtitle) authSubtitle.textContent = "Sign in to your GreenTap Health account";
+        if (authSubtitle) authSubtitle.textContent = "Sign in to your SanHerbs account";
         if (loginBtn) loginBtn.style.display = "block";
         if (signupBtn) signupBtn.style.display = "none";
         if (toggleText) {
-            toggleText.innerHTML = 'Don\'t have an account? <a href="#" id="toggleLink">Sign up here</a>';
+            toggleText.innerHTML = 'Don\\'t have an account? <a href="#" id="toggleLink">Sign up here</a>';
         }
     }
 
@@ -96,7 +117,7 @@ function setAuthMode(isSignup) {
     clearMessage();
 }
 
-// Product Ordering Initialization - NO WHATSAPP
+// Product Ordering Initialization - ENHANCED FOR SANHERBS
 function initializeProductOrdering() {
     const productButtons = document.querySelectorAll('.add-to-cart-btn');
     const buyNowButtons = document.querySelectorAll('.buy-now-btn');
@@ -109,11 +130,19 @@ function initializeProductOrdering() {
             const productName = this.getAttribute('data-product');
             const price = this.getAttribute('data-price');
             const productId = this.getAttribute('data-product-id');
+            const image = this.getAttribute('data-image');
+            const category = this.getAttribute('data-category');
             
-            console.log('Product data:', { productName, price, productId });
+            console.log('Product data:', { productName, price, productId, image, category });
             
             if (productName && price) {
-                addToCart(productName, price, productId);
+                addToCart({
+                    id: productId,
+                    name: productName, 
+                    price: price,
+                    image: image,
+                    category: category
+                });
             } else {
                 console.error('Missing product data');
                 showMessage("❌ Product information missing", "error");
@@ -128,11 +157,20 @@ function initializeProductOrdering() {
             
             const productName = this.getAttribute('data-product');
             const price = this.getAttribute('data-price');
+            const productId = this.getAttribute('data-product-id');
+            const image = this.getAttribute('data-image');
+            const category = this.getAttribute('data-category');
             
-            console.log('Buy now data:', { productName, price });
+            console.log('Buy now data:', { productName, price, productId });
             
             if (productName && price) {
-                buyNow(productName, price);
+                buyNow({
+                    id: productId,
+                    name: productName,
+                    price: price,
+                    image: image,
+                    category: category
+                });
             } else {
                 console.error('Missing product data');
                 showMessage("❌ Product information missing", "error");
@@ -141,17 +179,23 @@ function initializeProductOrdering() {
     });
 }
 
-// Plan Subscription Initialization - NO WHATSAPP
+// Plan Subscription Initialization - ENHANCED FOR SANHERBS
 function initializePlanSubscription() {
     const planButtons = document.querySelectorAll('.plan-btn');
-
+    
     planButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             const planName = this.getAttribute('data-plan');
             const price = this.getAttribute('data-price');
+            const planId = this.getAttribute('data-plan-id');
+            
             if (planName && price) {
-                subscribePlan(planName, price);
+                subscribePlan({
+                    id: planId,
+                    name: planName,
+                    price: price
+                });
             }
         });
     });
@@ -176,30 +220,62 @@ function initializeNavigation() {
             }
         });
     });
+
+    // Update navigation based on auth status
+    updateNavigation();
 }
 
-// Cart Functions - ONLINE PAYMENT ONLY
-function addToCart(productName, price, productId = null) {
-    console.log('Adding to cart:', { productName, price, productId });
+// NEW: Update navigation based on authentication status
+function updateNavigation() {
+    const loginNavItem = document.querySelector('a[href*="login"]');
+    const profileNavItem = document.querySelector('a[href*="profile"]');
+    const ordersNavItem = document.querySelector('a[href*="orders"]');
+    
+    if (authToken) {
+        // User is logged in
+        if (loginNavItem) loginNavItem.style.display = 'none';
+        if (profileNavItem) profileNavItem.style.display = 'block';
+        if (ordersNavItem) ordersNavItem.style.display = 'block';
+    } else {
+        // User is not logged in
+        if (loginNavItem) loginNavItem.style.display = 'block';
+        if (profileNavItem) profileNavItem.style.display = 'none';
+        if (ordersNavItem) ordersNavItem.style.display = 'none';
+    }
+}
+
+// Cart Functions - ENHANCED FOR SANHERBS
+function addToCart(product) {
+    console.log('Adding to cart:', product);
     
     try {
-        // Add to cart functionality
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        // Use SanHerbs cart storage
+        let cart = JSON.parse(localStorage.getItem('sanherbs_cart')) || 
+                  JSON.parse(localStorage.getItem('greentap_cart')) || 
+                  JSON.parse(localStorage.getItem('cart')) || [];
         
-        const existingItem = cart.find(item => item.name === productName);
+        const existingItem = cart.find(item => item.id === product.id || item.name === product.name);
+        
         if (existingItem) {
             existingItem.quantity += 1;
         } else {
             cart.push({
-                id: productId || Date.now(),
-                name: productName,
-                price: parseFloat(price),
-                quantity: 1
+                id: product.id || `product_${Date.now()}`,
+                name: product.name,
+                price: parseFloat(product.price),
+                quantity: 1,
+                image: product.image || '/images/products/default.jpg',
+                category: product.category || 'supplements',
+                addedAt: new Date().toISOString()
             });
         }
         
+        // Save to multiple storage keys for compatibility
+        localStorage.setItem('sanherbs_cart', JSON.stringify(cart));
+        localStorage.setItem('greentap_cart', JSON.stringify(cart));
         localStorage.setItem('cart', JSON.stringify(cart));
-        showMessage(`✅ ${productName} added to cart!`, "success");
+        
+        showMessage(`✅ ${product.name} added to cart!`, "success");
         updateCartCount();
         
         console.log('Cart updated:', cart);
@@ -209,39 +285,53 @@ function addToCart(productName, price, productId = null) {
     }
 }
 
-function buyNow(productName, price) {
-    console.log('Buy now:', { productName, price });
+function buyNow(product) {
+    console.log('Buy now:', product);
     
     try {
-        // Redirect to checkout with this item
-        const item = {
-            id: Date.now(),
-            name: productName,
-            price: parseFloat(price),
-            quantity: 1
-        };
+        // Check if user is authenticated
+        if (!authToken) {
+            showMessage("Please login to make a purchase", "error");
+            setTimeout(() => {
+                window.location.href = '/login.html?redirect=checkout';
+            }, 1500);
+            return;
+        }
+
+        // Add to cart and redirect to cart page
+        addToCart(product);
         
-        localStorage.setItem('checkoutItem', JSON.stringify(item));
-        window.location.href = '/checkout.html';
+        setTimeout(() => {
+            window.location.href = '/cart.html';
+        }, 1000);
     } catch (error) {
         console.error('Error in buy now:', error);
         showMessage("❌ Failed to proceed to checkout", "error");
     }
 }
 
-function subscribePlan(planName, price) {
-    console.log('Subscribe to plan:', { planName, price });
+function subscribePlan(plan) {
+    console.log('Subscribe to plan:', plan);
     
     try {
-        // Redirect to subscription checkout
-        const plan = {
-            id: Date.now(),
-            name: planName,
-            price: parseFloat(price),
+        // Check if user is authenticated
+        if (!authToken) {
+            showMessage("Please login to subscribe to a plan", "error");
+            setTimeout(() => {
+                window.location.href = '/login.html?redirect=plans';
+            }, 1500);
+            return;
+        }
+
+        // Store plan for checkout
+        const planData = {
+            id: plan.id || `plan_${Date.now()}`,
+            name: plan.name,
+            price: parseFloat(plan.price),
             type: 'subscription'
         };
         
-        localStorage.setItem('checkoutPlan', JSON.stringify(plan));
+        localStorage.setItem('checkoutPlan', JSON.stringify(planData));
         window.location.href = '/checkout.html';
     } catch (error) {
         console.error('Error in plan subscription:', error);
@@ -249,19 +339,30 @@ function subscribePlan(planName, price) {
     }
 }
 
-// Cart count update
+// Cart count update - ENHANCED
 function updateCartCount() {
     try {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const cartCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
-        const cartCountElement = document.querySelector('.cart-count');
+        const cart = JSON.parse(localStorage.getItem('sanherbs_cart')) || 
+                     JSON.parse(localStorage.getItem('greentap_cart')) || 
+                     JSON.parse(localStorage.getItem('cart')) || [];
+        
+        const cartCount = cart.reduce((total, item) => total + (parseInt(item.quantity) || 0), 0);
+        const cartCountElements = document.querySelectorAll('.cart-count');
         
         console.log('Updating cart count:', cartCount);
         
-        if (cartCountElement) {
-            cartCountElement.textContent = cartCount;
-            cartCountElement.style.display = cartCount > 0 ? 'inline-flex' : 'none';
-        }
+        cartCountElements.forEach(element => {
+            if (element) {
+                element.textContent = cartCount;
+                element.style.display = cartCount > 0 ? 'inline-flex' : 'none';
+                
+                // Add animation for updates
+                if (cartCount > 0) {
+                    element.classList.add('cart-count-updated');
+                    setTimeout(() => element.classList.remove('cart-count-updated'), 300);
+                }
+            }
+        });
     } catch (error) {
         console.error('Error updating cart count:', error);
     }
@@ -278,7 +379,7 @@ function initializeFilters() {
             // Update active button
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
-
+            
             const category = button.getAttribute('data-category');
             filterProducts(category);
         });
@@ -295,7 +396,7 @@ function initializeFilters() {
 
 function filterProducts(category) {
     const productCards = document.querySelectorAll('.product-card');
-
+    
     productCards.forEach(card => {
         if (category === 'all') {
             card.style.display = 'block';
@@ -312,11 +413,11 @@ function filterProducts(category) {
 
 function searchProducts(searchTerm) {
     const productCards = document.querySelectorAll('.product-card');
-
+    
     productCards.forEach(card => {
         const productName = card.querySelector('h3')?.textContent?.toLowerCase() || '';
         const productDescription = card.querySelector('.product-subtitle')?.textContent?.toLowerCase() || '';
-
+        
         if (productName.includes(searchTerm) || productDescription.includes(searchTerm)) {
             card.style.display = 'block';
         } else {
@@ -325,11 +426,7 @@ function searchProducts(searchTerm) {
     });
 }
 
-// API Configuration
-const API_BASE_URL = 'http://localhost:3000/api';
-let authToken = localStorage.getItem('authToken');
-
-// API Helper Functions
+// API Helper Functions - ENHANCED ERROR HANDLING
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const defaultOptions = {
@@ -354,8 +451,16 @@ async function apiCall(endpoint, options = {}) {
     try {
         console.log('Making API call to:', url);
         const response = await fetch(url, finalOptions);
-        const data = await response.json();
-
+        
+        // Handle non-JSON responses
+        let data;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            data = { message: await response.text() };
+        }
+        
         console.log('API response:', { status: response.status, data });
 
         if (!response.ok) {
@@ -365,6 +470,12 @@ async function apiCall(endpoint, options = {}) {
         return data;
     } catch (error) {
         console.error('API Error:', error);
+        
+        // Enhanced error handling for different scenarios
+        if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+            throw new Error('Cannot connect to server. Please check your internet connection.');
+        }
+        
         throw error;
     }
 }
@@ -424,7 +535,7 @@ function validateInputs(mobile, password) {
     return true;
 }
 
-// Authentication Functions - FIXED VERSION (NO DEMO FALLBACK)
+// Authentication Functions - ENHANCED FOR SANHERBS
 async function login() {
     const mobile = document.getElementById("mobile")?.value?.trim();
     const password = document.getElementById("password")?.value?.trim();
@@ -433,7 +544,7 @@ async function login() {
 
     try {
         showMessage("Logging in...", "success");
-
+        
         const response = await apiCall('/auth/login', {
             method: 'POST',
             body: JSON.stringify({ mobile, password })
@@ -443,20 +554,30 @@ async function login() {
             authToken = response.token;
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('user', JSON.stringify(response.user));
-
+            
             showMessage("✅ Login successful!", "success");
+            updateNavigation();
+            
+            // Check for redirect parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            
             setTimeout(() => {
-                window.location.href = '/'; // Redirect to home page
+                if (redirect === 'checkout') {
+                    window.location.href = '/checkout.html';
+                } else if (redirect === 'plans') {
+                    window.location.href = '/plans.html';
+                } else {
+                    window.location.href = '/'; // Redirect to home page
+                }
             }, 1000);
         }
     } catch (error) {
         console.error('Login error:', error);
         
-        // Check if it's a network error (API not reachable)
-        if (error.message.includes('fetch') || error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-            showMessage("❌ Cannot connect to server. Please check if the server is running on http://localhost:3000", "error");
+        if (error.message.includes('Cannot connect to server')) {
+            showMessage(`❌ ${error.message}. Backend URL: ${API_BASE_URL}`, "error");
         } else {
-            // Show the actual error from the server
             showMessage(`❌ ${error.message}`, "error");
         }
     }
@@ -470,7 +591,7 @@ async function signup() {
 
     try {
         showMessage("Creating account...", "success");
-
+        
         const response = await apiCall('/auth/register', {
             method: 'POST',
             body: JSON.stringify({ mobile, password })
@@ -493,11 +614,9 @@ async function signup() {
     } catch (error) {
         console.error('Signup error:', error);
         
-        // Check if it's a network error
-        if (error.message.includes('fetch') || error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-            showMessage("❌ Cannot connect to server. Please check if the server is running on http://localhost:3000", "error");
+        if (error.message.includes('Cannot connect to server')) {
+            showMessage(`❌ ${error.message}. Backend URL: ${API_BASE_URL}`, "error");
         } else {
-            // Show the actual error from the server
             showMessage(`❌ ${error.message}`, "error");
         }
     }
@@ -505,76 +624,128 @@ async function signup() {
 
 function toggleAuthMode() {
     setAuthMode(!isSignupMode);
-
+    
     const mobileInput = document.getElementById("mobile");
     const passwordInput = document.getElementById("password");
     
     if (mobileInput) mobileInput.value = "";
     if (passwordInput) passwordInput.value = "";
-
+    
     setTimeout(() => {
         clearMessage();
     }, 1000);
 }
 
-function loadMain(mobile) {
-    clearMessage();
-    
-    const authSection = document.querySelector(".auth-section");
-    const mainSection = document.getElementById("main-section");
-    const welcomeText = document.getElementById("welcome-text");
-
-    if (authSection) authSection.style.display = "none";
-    if (mainSection) mainSection.style.display = "block";
-    if (welcomeText) welcomeText.innerText = `Welcome, ${mobile}!`;
-
-    loadHealthTips();
+// NEW: Load user profile data
+async function loadUserProfile() {
+    try {
+        const response = await apiCall('/users/profile');
+        if (response.success) {
+            const user = response.user;
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            // Update UI with user data
+            const userNameElements = document.querySelectorAll('.user-name');
+            userNameElements.forEach(element => {
+                if (element) element.textContent = user.mobile || 'User';
+            });
+        }
+    } catch (error) {
+        console.log('Could not load user profile:', error.message);
+    }
 }
 
 function logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('sanherbs_cart');
+    localStorage.removeItem('greentap_cart');
     localStorage.removeItem('cart');
+    
     authToken = null;
-
+    
+    updateNavigation();
+    updateCartCount();
+    
     const authSection = document.querySelector(".auth-section");
     const mainSection = document.getElementById("main-section");
-
+    
     if (authSection) authSection.style.display = "block";
     if (mainSection) mainSection.style.display = "none";
-
+    
     const mobileInput = document.getElementById("mobile");
     const passwordInput = document.getElementById("password");
     
     if (mobileInput) mobileInput.value = "";
     if (passwordInput) passwordInput.value = "";
-
+    
     clearMessage();
-    updateCartCount();
+    showMessage("✅ Logged out successfully!", "success");
+    
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 1500);
 }
 
 function loadHealthTips() {
     const tips = [
         "💡 Take supplements with meals for better absorption",
         "💧 Drink plenty of water throughout the day",
-        "🏃♂️ Combine supplements with regular exercise",
+        "🏃‍♂️ Combine supplements with regular exercise",
         "😴 Get 7-8 hours of quality sleep",
-        "🥗 Maintain a balanced diet rich in fruits and vegetables"
+        "🥗 Maintain a balanced diet rich in fruits and vegetables",
+        "🌿 Choose natural and organic supplements when possible",
+        "📅 Follow consistent supplement schedules for best results"
     ];
-
+    
     const tipsContainer = document.getElementById("health-tips");
     if (tipsContainer) {
         tipsContainer.innerHTML = tips.map(tip => `<div class="tip-item">${tip}</div>`).join('');
     }
 }
 
-// Initialize profile tabs and animations (stubs)
+// Initialize profile tabs and animations
 function initializeProfileTabs() {
-    // Profile tab functionality
+    const tabButtons = document.querySelectorAll('.profile-tab-btn');
+    const tabContents = document.querySelectorAll('.profile-tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            const targetContent = document.getElementById(targetTab);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        });
+    });
 }
 
 function initializeAnimations() {
-    // Animation initialization
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, observerOptions);
+    
+    // Observe elements with animation classes
+    document.querySelectorAll('.product-card, .feature-card, .plan-card').forEach(el => {
+        observer.observe(el);
+    });
 }
 
 function checkAuth() {
@@ -587,12 +758,113 @@ function checkAuth() {
     }
 }
 
-function loadProducts() {
-    // Load products for marketplace
-    console.log('Loading products...');
+// NEW: Load products from backend
+async function loadProducts() {
+    try {
+        console.log('Loading products from backend...');
+        const response = await apiCall('/products');
+        
+        if (response.success && response.products) {
+            renderProducts(response.products);
+        }
+    } catch (error) {
+        console.log('Could not load products from backend:', error.message);
+        // Continue with static products if backend fails
+    }
 }
 
-function loadPlans() {
-    // Load subscription plans
-    console.log('Loading plans...');
+// NEW: Render products dynamically
+function renderProducts(products) {
+    const productsContainer = document.getElementById('products-container');
+    if (!productsContainer) return;
+    
+    const productHTML = products.map(product => `
+        <div class="product-card" data-category="${product.category}">
+            <div class="product-image">
+                ${product.image ? 
+                    `<img src="${product.image}" alt="${product.name}" loading="lazy">` : 
+                    '💊'
+                }
+            </div>
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <p class="product-subtitle">${product.description || 'Premium health supplement'}</p>
+                <div class="product-price">₹${parseFloat(product.price).toFixed(2)}</div>
+                <div class="product-buttons">
+                    <button class="add-to-cart-btn"
+                            data-product-id="${product.id}"
+                            data-product="${product.name}"
+                            data-price="${product.price}"
+                            data-image="${product.image}"
+                            data-category="${product.category}">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="buy-now-btn"
+                            data-product-id="${product.id}"
+                            data-product="${product.name}"
+                            data-price="${product.price}"
+                            data-image="${product.image}"
+                            data-category="${product.category}">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    productsContainer.innerHTML = productHTML;
+    
+    // Reinitialize product ordering after rendering
+    initializeProductOrdering();
 }
+
+// NEW: Load plans from backend
+async function loadPlans() {
+    try {
+        console.log('Loading plans from backend...');
+        const response = await apiCall('/plans');
+        
+        if (response.success && response.plans) {
+            renderPlans(response.plans);
+        }
+    } catch (error) {
+        console.log('Could not load plans from backend:', error.message);
+        // Continue with static plans if backend fails
+    }
+}
+
+// NEW: Render plans dynamically
+function renderPlans(plans) {
+    const plansContainer = document.getElementById('plans-container');
+    if (!plansContainer) return;
+    
+    const planHTML = plans.map(plan => `
+        <div class="plan-card ${plan.featured ? 'featured' : ''}">
+            <div class="plan-header">
+                <h3>${plan.name}</h3>
+                <div class="plan-price">₹${parseFloat(plan.price).toFixed(2)}<span>/month</span></div>
+            </div>
+            <div class="plan-features">
+                ${(plan.features || []).map(feature => `<div class="feature">✓ ${feature}</div>`).join('')}
+            </div>
+            <button class="plan-btn ${plan.featured ? 'featured' : ''}"
+                    data-plan-id="${plan.id}"
+                    data-plan="${plan.name}"
+                    data-price="${plan.price}">
+                ${plan.featured ? 'Choose Premium' : 'Select Plan'}
+            </button>
+        </div>
+    `).join('');
+    
+    plansContainer.innerHTML = planHTML;
+    
+    // Reinitialize plan subscription after rendering
+    initializePlanSubscription();
+}
+
+// Expose functions globally for onclick handlers
+window.login = login;
+window.signup = signup;
+window.logout = logout;
+window.clearMessage = clearMessage;
+
