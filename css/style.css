@@ -2578,3 +2578,24 @@ textarea:focus {
         font-size: 2rem;
     }
 }
+.logout-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.logout-btn i {
+    margin-right: 5px;
+}
+
