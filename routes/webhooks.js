@@ -3,8 +3,8 @@ const router = express.Router();
 const crypto = require('crypto');
 const razorpayService = require('../services/razorpay');
 const shiprocketService = require('../services/shiprocket');
-const emailService = require('../services/emailService');
-const smsService = require('../services/smsService');
+const emailService = require('../services/emailservice');
+const smsService = require('../services/smsservice');
 const { attachDatabase } = require('../middleware/auth'); // Import database middleware
 
 // Razorpay webhook endpoint - FIXED VERSION
@@ -366,3 +366,4 @@ router.post('/test', attachDatabase, async (req, res) => {
 });
 
 module.exports = router;
+
