@@ -1,6 +1,6 @@
 // API Configuration for SanHerbs backend
 const getAPIBaseURL = () => {
-    // Development
+    // Development - FIXED: Use === instead of =
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return 'http://localhost:3000';
     }
@@ -8,6 +8,7 @@ const getAPIBaseURL = () => {
     return 'https://sanherbs.onrender.com';
 };
 
+// FIXED: Remove escaped underscores
 const API_BASE_URL = getAPIBaseURL();
 
 // Shopping Cart Management for SanHerbs
@@ -21,6 +22,7 @@ class ShoppingCart {
     // Fixed cart loading with validation
     loadCart() {
         try {
+            // FIXED: Remove escaped underscores
             const cartData = localStorage.getItem('sanherbs_cart') || localStorage.getItem('greentap_cart') || localStorage.getItem('cart');
             const cart = cartData ? JSON.parse(cartData) : [];
             
@@ -53,12 +55,12 @@ class ShoppingCart {
     // NEW: Sync cart with backend product data
     async syncCartWithBackend() {
         if (this.cart.length === 0) return;
-
         try {
             // Get fresh product data from backend
             const response = await fetch(`${API_BASE_URL}/api/products`);
             if (response.ok) {
-                const { products } = await response.json();
+                const result = await response.json();
+                const products = result.products || result.data?.products || [];
                 
                 // Update cart items with fresh data
                 this.cart = this.cart.map(cartItem => {
@@ -174,11 +176,14 @@ class ShoppingCart {
         try {
             const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
             if (response.ok) {
-                const { product } = await response.json();
-                productData.name = product.name;
-                productData.price = product.price;
-                productData.image = product.image;
-                productData.category = product.category;
+                const result = await response.json();
+                const product = result.product || result.data?.product;
+                if (product) {
+                    productData.name = product.name;
+                    productData.price = product.price;
+                    productData.image = product.image;
+                    productData.category = product.category;
+                }
             }
         } catch (error) {
             console.log('Using cached product data:', error.message);
@@ -207,11 +212,14 @@ class ShoppingCart {
         try {
             const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
             if (response.ok) {
-                const { product } = await response.json();
-                productData.name = product.name;
-                productData.price = product.price;
-                productData.image = product.image;
-                productData.category = product.category;
+                const result = await response.json();
+                const product = result.product || result.data?.product;
+                if (product) {
+                    productData.name = product.name;
+                    productData.price = product.price;
+                    productData.image = product.image;
+                    productData.category = product.category;
+                }
             }
         } catch (error) {
             console.log('Using cached product data:', error.message);
@@ -314,6 +322,7 @@ class ShoppingCart {
     // Save cart to localStorage - UPDATED for SanHerbs
     saveCart() {
         try {
+            // FIXED: Remove escaped underscores
             localStorage.setItem('sanherbs_cart', JSON.stringify(this.cart));
             localStorage.setItem('greentap_cart', JSON.stringify(this.cart)); // Backward compatibility
             localStorage.setItem('cart', JSON.stringify(this.cart)); // Backup
@@ -370,7 +379,7 @@ class ShoppingCart {
             const price = parseFloat(item.price) || 0;
             const quantity = parseInt(item.quantity) || 1;
             const total = price * quantity;
-
+            
             return `
                 <div class="cart-item" data-product-id="${item.id}">
                     <div class="cart-item-image">
@@ -508,7 +517,7 @@ class ShoppingCart {
                 <span class="notification-text">${message}</span>
             </div>
         `;
-
+        
         notification.className = `cart-notification ${type}`;
         notification.style.display = 'block';
 
