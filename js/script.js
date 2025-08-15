@@ -254,21 +254,25 @@ function initializeNavigation() {
 // NEW: Update navigation based on authentication status
 function updateNavigation() {
     const loginNavItem = document.querySelector('a[href*="login"]');
+    const logoutBtn = document.getElementById('logoutBtn'); // ✅ Add this
     const profileNavItem = document.querySelector('a[href*="profile"]');
     const ordersNavItem = document.querySelector('a[href*="orders"]');
     
     if (authToken) {
         // User is logged in
         if (loginNavItem) loginNavItem.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'block'; // ✅ Show logout
         if (profileNavItem) profileNavItem.style.display = 'block';
         if (ordersNavItem) ordersNavItem.style.display = 'block';
     } else {
         // User is not logged in
         if (loginNavItem) loginNavItem.style.display = 'block';
+        if (logoutBtn) logoutBtn.style.display = 'none'; // ✅ Hide logout
         if (profileNavItem) profileNavItem.style.display = 'none';
         if (ordersNavItem) ordersNavItem.style.display = 'none';
     }
 }
+
 
 // Cart Functions - ENHANCED FOR SANHERBS - FIXED COMPARISONS
 function addToCart(product) {
@@ -998,6 +1002,7 @@ function logout() {
 
 // Make logout function globally available
 window.logout = logout;
+
 
 
 
