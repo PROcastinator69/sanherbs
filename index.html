@@ -9,27 +9,32 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <h2><i class="fas fa-leaf"></i> sanherbs</h2>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link active">Home</a></li>
-                <li><a href="marketplace.html" class="nav-link">Products</a></li>
-                <li><a href="plans.html" class="nav-link">Plans</a></li>
-                <li><a href="cart.html" class="nav-link cart-link">
-                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
-                </a></li>
-                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-logo">
+            <h2><i class="fas fa-leaf"></i> sanherbs</h2>
         </div>
-    </nav>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="marketplace.html" class="nav-link">Products</a></li>
+            <li><a href="plans.html" class="nav-link">Plans</a></li>
+            <li><a href="cart.html" class="nav-link cart-link">
+                <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+            </a></li>
+            <!-- Show login button when not logged in -->
+            <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+            <!-- Show logout button when logged in -->
+            <li><button id="logoutBtn" class="nav-link logout-btn" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button></li>
+        </ul>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -184,3 +189,4 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+
