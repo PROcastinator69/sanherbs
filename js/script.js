@@ -546,43 +546,29 @@ async function login() {
     try {
         showMessage("Logging in...", "success");
         
-        // Use redirect: 'manual' to prevent automatic redirect following
+        // Use regular fetch without manual redirect handling
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ mobile, password }),
-            redirect: 'manual'
+            body: JSON.stringify({ mobile, password })
         });
 
         console.log('Login response status:', response.status);
 
-        // Handle 302 redirect response
-        if (response.status === 302) {
-            const location = response.headers.get('Location');
-            console.log('Redirect location:', location);
-            
-            if (location) {
-                showMessage("✅ Login successful! Redirecting...", "success");
-                
-                setTimeout(() => {
-                    window.location.href = location;
-                }, 1000);
-                return;
-            } else {
-                throw new Error('Redirect location header missing');
-            }
-        }
-
-        // Handle normal 200 OK response
         if (response.ok) {
             const data = await response.json();
+            console.log('Login response data:', data);
             
-            if (data.data && data.data.token) {
-                authToken = data.data.token;
+            // Handle both response formats
+            const token = data.token || data.data?.token;
+            const user = data.user || data.data?.user;
+            
+            if (token) {
+                authToken = token;
                 localStorage.setItem('authToken', authToken);
-                localStorage.setItem('user', JSON.stringify(data.data.user));
+                localStorage.setItem('user', JSON.stringify(user));
                 
                 showMessage("✅ Login successful!", "success");
                 updateNavigation();
@@ -600,22 +586,24 @@ async function login() {
                     }
                 }, 1000);
             } else {
-                throw new Error('Invalid login response format');
+                throw new Error('Invalid login response - no token received');
             }
         } else {
-            throw new Error(`Login failed with status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Login failed with status: ${response.status}`);
         }
 
     } catch (error) {
         console.error('Login error:', error);
         
-        if (error.message.includes('Failed to fetch')) {
-            showMessage(`❌ Cannot connect to server. Backend URL: ${API_BASE_URL}`, "error");
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            showMessage(`❌ Cannot connect to server. Please check CORS configuration. Backend: ${API_BASE_URL}`, "error");
         } else {
             showMessage(`❌ ${error.message}`, "error");
         }
     }
 }
+
 
 // FIXED SIGNUP FUNCTION - DEBUG VERSION
 async function signup() {
@@ -935,3 +923,4 @@ window.login = login;
 window.signup = signup;
 window.logout = logout;
 window.clearMessage = clearMessage;
+
