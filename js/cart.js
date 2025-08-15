@@ -105,22 +105,8 @@ class ShoppingCart {
     }
 
     bindEvents() {
-        // Add to cart buttons (marketplace)
+        // Remove item buttons
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart-btn') || e.target.closest('.add-to-cart-btn')) {
-                e.preventDefault();
-                const button = e.target.classList.contains('add-to-cart-btn') ? e.target : e.target.closest('.add-to-cart-btn');
-                this.addToCartFromButton(button);
-            }
-
-            // NEW: Buy Now buttons handling
-            if (e.target.classList.contains('buy-now-btn') || e.target.closest('.buy-now-btn')) {
-                e.preventDefault();
-                const button = e.target.classList.contains('buy-now-btn') ? e.target : e.target.closest('.buy-now-btn');
-                this.buyNowFromButton(button);
-            }
-
-            // Remove item buttons
             if (e.target.classList.contains('remove-item-btn')) {
                 const productId = e.target.getAttribute('data-product-id');
                 this.removeFromCart(productId);
@@ -154,84 +140,6 @@ class ShoppingCart {
         if (clearCartBtn) {
             clearCartBtn.addEventListener('click', () => this.clearCart());
         }
-    }
-
-    // Add product to cart from marketplace button
-    async addToCartFromButton(button) {
-        const productData = {
-            id: button.getAttribute('data-product-id') || `product_${Date.now()}`,
-            name: button.getAttribute('data-product') || 'Unknown Product',
-            price: parseFloat(button.getAttribute('data-price')) || 0,
-            image: button.getAttribute('data-image') || '/images/products/default.jpg',
-            category: button.getAttribute('data-category') || 'supplements'
-        };
-
-        // Validate price
-        if (productData.price <= 0) {
-            this.showCartNotification('Error: Invalid product price', 'error');
-            return;
-        }
-
-        // Try to get fresh product data from backend
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
-            if (response.ok) {
-                const result = await response.json();
-                const product = result.product || result.data?.product;
-                if (product) {
-                    productData.name = product.name;
-                    productData.price = product.price;
-                    productData.image = product.image;
-                    productData.category = product.category;
-                }
-            }
-        } catch (error) {
-            console.log('Using cached product data:', error.message);
-        }
-
-        this.addToCart(productData);
-    }
-
-    // NEW: Buy Now functionality
-    async buyNowFromButton(button) {
-        const productData = {
-            id: button.getAttribute('data-product-id') || `product_${Date.now()}`,
-            name: button.getAttribute('data-product') || 'Unknown Product',
-            price: parseFloat(button.getAttribute('data-price')) || 0,
-            image: button.getAttribute('data-image') || '/images/products/default.jpg',
-            category: button.getAttribute('data-category') || 'supplements'
-        };
-
-        // Validate price
-        if (productData.price <= 0) {
-            this.showCartNotification('Error: Invalid product price', 'error');
-            return;
-        }
-
-        // Try to get fresh product data from backend
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/products/${productData.id}`);
-            if (response.ok) {
-                const result = await response.json();
-                const product = result.product || result.data?.product;
-                if (product) {
-                    productData.name = product.name;
-                    productData.price = product.price;
-                    productData.image = product.image;
-                    productData.category = product.category;
-                }
-            }
-        } catch (error) {
-            console.log('Using cached product data:', error.message);
-        }
-
-        // Add to cart and redirect to cart page
-        this.addToCart(productData);
-        
-        // Small delay to ensure cart is updated before redirect
-        setTimeout(() => {
-            window.location.href = '/cart.html';
-        }, 500);
     }
 
     // Add item to cart
@@ -498,45 +406,30 @@ class ShoppingCart {
 
     // Enhanced cart notification
     showCartNotification(message, type = 'success') {
-        const notification = document.getElementById('cartNotification');
-        if (!notification) {
-            // Create notification if it doesn't exist
-            this.createCartNotification();
-            return this.showCartNotification(message, type);
-        }
-
-        const iconMap = {
-            success: '<i class="fas fa-check-circle"></i>',
-            error: '<i class="fas fa-exclamation-circle"></i>',
-            info: '<i class="fas fa-info-circle"></i>'
-        };
-
-        notification.innerHTML = `
-            <div class="notification-content">
-                <span class="notification-icon">${iconMap[type] || iconMap.success}</span>
-                <span class="notification-text">${message}</span>
-            </div>
-        `;
+        console.log('Cart notification:', message, type);
         
-        notification.className = `cart-notification ${type}`;
-        notification.style.display = 'block';
-
-        setTimeout(() => {
-            notification.classList.add('fade-out');
-            setTimeout(() => {
-                notification.style.display = 'none';
-                notification.classList.remove('fade-out');
-            }, 300);
-        }, 3000);
-    }
-
-    // Create cart notification element if missing
-    createCartNotification() {
+        // Create a simple notification
         const notification = document.createElement('div');
-        notification.id = 'cartNotification';
-        notification.className = 'cart-notification';
-        notification.style.display = 'none';
+        notification.className = `cart-notification ${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            border-radius: 5px;
+            z-index: 9999;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        `;
+        notification.textContent = message;
+        
         document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 
     // Proceed to checkout - UPDATED for SanHerbs
