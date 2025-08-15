@@ -1,15 +1,4 @@
-// API Configuration for SanHerbs backend
-const getAPIBaseURL = () => {
-    // Development - FIXED: Use === instead of =
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:3000';
-    }
-    // Production - Your actual Render URL
-    return 'https://sanherbs.onrender.com';
-};
 
-// FIXED: Remove escaped underscores
-const API_BASE_URL = getAPIBaseURL();
 
 // Shopping Cart Management for SanHerbs
 class ShoppingCart {
@@ -510,5 +499,6 @@ window.ShoppingCart = ShoppingCart;
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShoppingCart;
 }
+
 
 
