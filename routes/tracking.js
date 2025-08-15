@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/database');
 const shiprocketService = require('../services/shiprocket');
-const emailService = require('../services/emailService');
-const smsService = require('../services/smsService');
+const emailService = require('../services/emailservice');
+const smsService = require('../services/smsservice');
 
 // Track order by ID (public endpoint)
 router.get('/order/:orderId', async (req, res) => {
@@ -264,3 +264,4 @@ router.post('/manual-update', async (req, res) => {
 });
 
 module.exports = router;
+
