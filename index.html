@@ -9,39 +9,36 @@
 </head>
 <body>
     <!-- Navigation -->
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-logo">
-            <h2><i class="fas fa-leaf"></i> sanherbs</h2>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-leaf"></i> sanherbs</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="marketplace.html" class="nav-link">Products</a></li>
+                <li><a href="plans.html" class="nav-link">Plans</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+                </a></li>
+                <li class="nav-item login-nav" style="display: block;">
+                    <a href="login.html" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </li>
+                <li class="nav-item logout-nav" style="display: none;">
+                    <button id="logoutBtn" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li><a href="marketplace.html" class="nav-link">Products</a></li>
-            <li><a href="plans.html" class="nav-link">Plans</a></li>
-            <li><a href="cart.html" class="nav-link cart-link">
-                <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
-            </a></li>
-            <!-- Login button - shown when NOT logged in -->
-            <li class="nav-item login-nav" style="display: block;">
-                <a href="login.html" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </a>
-            </li>
-            <!-- Logout button - hidden by default, shown when logged in -->
-            <li class="nav-item logout-nav" style="display: none;">
-                <button id="logoutBtn" class="nav-link logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </li>
-        </ul>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</nav>
-
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -49,14 +46,12 @@
             <div class="hero-text">
                 <h1>Premium Health Supplements</h1>
                 <p>Discover the power of nature with our organic, lab-tested health supplements. Boost your immunity, energy, and overall wellness naturally.</p>
-                
                 <div class="hero-features">
                     <div class="feature-item">
                         <i class="fas fa-check-circle"></i>
                         <span><strong>100% Pure</strong> • Lab Tested • No Additives</span>
                     </div>
                 </div>
-
                 <div class="hero-buttons">
                     <a href="marketplace.html" class="btn-primary">
                         <i class="fas fa-shopping-bag"></i> Shop Now
@@ -89,20 +84,17 @@
                 <div class="product-details">
                     <h3>Premium Immunity Booster</h3>
                     <p class="product-desc">Advanced formula with natural ingredients to boost your immune system and overall health.</p>
-                    
                     <div class="benefits-mini">
                         <span class="benefit-tag">Natural Ingredients</span>
                         <span class="benefit-tag">Lab Tested</span>
                         <span class="benefit-tag">60 Capsules</span>
                         <span class="benefit-tag">Fast Delivery</span>
                     </div>
-                    
                     <div class="price-display">
                         <span class="old-price">₹1,299</span>
                         <span class="new-price">₹899</span>
                         <span class="save-amount">Save ₹400</span>
                     </div>
-                    
                     <div class="product-actions">
                         <button class="btn-primary add-to-cart-btn" 
                                 data-product="Premium Immunity Booster" 
@@ -187,20 +179,20 @@
                     </ul>
                 </div>
             </div>
-            <div class="footer-bottom">
+
+            <!-- Policy Links for Razorpay -->
+            <div class="footer-policies" style="margin-top:15px; text-align:center; font-size:14px;">
+                <a href="terms.html">Terms & Conditions</a> | 
+                <a href="privacy.html">Privacy Policy</a> | 
+                <a href="refund.html">Refund & Cancellation Policy</a>
+            </div>
+
+            <div class="footer-bottom" style="margin-top:10px;">
                 <p>&copy; 2025 sanherbs. All rights reserved.</p>
             </div>
         </div>
-         <p>
-        <a href="/terms.html">Terms & Conditions</a> | 
-        <a href="/privacy.html">Privacy Policy</a> | 
-        <a href="/refund.html">Refund & Cancellation Policy</a>
-    </p>
     </footer>
 
     <script src="js/script.js"></script>
 </body>
 </html>
-
-
-
