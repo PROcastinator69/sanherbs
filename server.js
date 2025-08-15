@@ -18,9 +18,14 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-// CORS configuration
+// CORS configuration - Updated for your architecture
 app.use(cors({
-    origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: [
+        'https://sanherbs.com',
+        'https://www.sanherbs.com', 
+        'http://localhost:3000', 
+        'http://127.0.0.1:3000'
+    ],
     credentials: true,
     optionsSuccessStatus: 200
 }));
@@ -46,8 +51,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Raw body parser for webhooks
 app.use('/api/webhooks', express.raw({ type: 'application/json' }));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// ❌ REMOVED: Static file serving (frontend is on GitHub Pages)
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
 const { attachDatabase, requestLogger } = require('./middleware/auth');
@@ -83,7 +88,7 @@ async function startServer() {
                 
                 res.json({
                     success: true,
-                    message: 'GreenTap Health API is running',
+                    message: 'SanHerbs API is running',
                     timestamp: new Date().toISOString(),
                     environment: process.env.NODE_ENV || 'development',
                     database: dbHealth,
@@ -105,12 +110,51 @@ async function startServer() {
             }
         });
 
+        // ✅ NEW: API-only root endpoint
+        app.get('/', (req, res) => {
+            res.json({
+                message: '🌿 SanHerbs API Server',
+                status: 'Running',
+                version: '1.0.0',
+                website: 'https://sanherbs.com',
+                architecture: {
+                    frontend: 'GitHub Pages (sanherbs.com)',
+                    backend: 'Render API Server',
+                    database: 'SQLite'
+                },
+                features: [
+                    'User Authentication (JWT)',
+                    'Product Catalog Management', 
+                    'Shopping Cart System',
+                    'Order Management',
+                    'Payment Processing (Razorpay)',
+                    'Delivery Tracking (Shiprocket)',
+                    'Email/SMS Notifications',
+                    'Real-time Order Status',
+                    'Subscription Plans',
+                    'Rate Limiting & Security'
+                ],
+                endpoints: {
+                    health: '/api/health',
+                    auth: '/api/auth',
+                    products: '/api/products',
+                    plans: '/api/plans',
+                    orders: '/api/orders',
+                    payments: '/api/payments',
+                    tracking: '/api/tracking',
+                    users: '/api/users',
+                    webhooks: '/api/webhooks'
+                }
+            });
+        });
+
         // API info endpoint
         app.get('/api', (req, res) => {
             res.json({
                 success: true,
-                message: 'Welcome to GreenTap Health E-commerce API',
+                message: 'Welcome to SanHerbs E-commerce API',
                 version: '1.0.0',
+                website: 'https://sanherbs.com',
                 features: [
                     'User Authentication (JWT)',
                     'Product Catalog Management', 
@@ -137,31 +181,8 @@ async function startServer() {
             });
         });
 
-        // Serve HTML pages with better error handling
-        const servePage = (route, filename) => {
-            app.get(route, (req, res, next) => {
-                const filePath = path.join(__dirname, 'public', filename);
-                res.sendFile(filePath, (err) => {
-                    if (err) {
-                        console.error(`Error serving ${filename}:`, err);
-                        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-                    }
-                });
-            });
-        };
-
-        // Frontend routes
-        servePage('/', 'index.html');
-        servePage('/login', 'login.html');
-        servePage('/marketplace', 'marketplace.html');
-        servePage('/cart', 'cart.html');
-        servePage('/checkout', 'checkout.html');
-        servePage('/orders', 'orders.html');
-        servePage('/order-tracking', 'order-tracking.html');
-        servePage('/profile', 'profile.html');
-        servePage('/plans', 'plans.html');
-        servePage('/payment-success', 'payment-success.html');
-        servePage('/payment-failed', 'payment-failed.html');
+        // ❌ REMOVED: Static HTML page serving (frontend is on GitHub Pages)
+        // servePage functions and HTML routes removed
 
         // 404 handler for API routes
         app.use('/api/*', (req, res) => {
@@ -183,9 +204,9 @@ async function startServer() {
             });
         });
 
-        // 404 handler for web pages (SPA fallback)
+        // ✅ UPDATED: Redirect non-API requests to main website
         app.use('*', (req, res) => {
-            res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+            res.redirect('https://sanherbs.com');
         });
 
         // Global error handler
@@ -210,7 +231,7 @@ async function startServer() {
             if (err.code === 'ENOENT') {
                 return res.status(404).json({
                     success: false,
-                    message: 'File not found'
+                    message: 'Resource not found'
                 });
             }
 
@@ -239,17 +260,18 @@ async function startServer() {
 
         // Start server
         const server = app.listen(PORT, () => {
-            console.log('🌿 GreenTap Health E-commerce Platform Started');
+            console.log('🌿 SanHerbs E-commerce API Started');
             console.log('━'.repeat(60));
-            console.log(`🚀 Server running at: http://localhost:${PORT}`);
-            console.log(`📊 API available at: http://localhost:${PORT}/api`);
+            console.log(`🚀 API Server running at: http://localhost:${PORT}`);
+            console.log(`📊 API endpoints at: http://localhost:${PORT}/api`);
             console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
+            console.log(`🌐 Frontend website: https://sanherbs.com`);
             console.log(`💳 Payment Gateway: ${process.env.RAZORPAY_KEY_ID ? 'Configured ✅' : 'Not Configured ❌'}`);
             console.log(`📧 Email Service: ${process.env.EMAIL_USER ? 'Configured ✅' : 'Not Configured ❌'}`);
             console.log(`📱 SMS Service: ${process.env.TWILIO_ACCOUNT_SID ? 'Configured ✅' : 'Not Configured ❌'}`);
             console.log(`🚚 Shipping Service: ${process.env.SHIPROCKET_EMAIL ? 'Configured ✅' : 'Not Configured ❌'}`);
             console.log('━'.repeat(60));
-            console.log('✅ Ready for registration and authentication!');
+            console.log('✅ Ready for API requests from sanherbs.com!');
             console.log('🛒 Features: Cart → Checkout → Razorpay Payment → Tracking');
             console.log('━'.repeat(60));
         });
@@ -287,7 +309,6 @@ async function startServer() {
         });
 
         return server;
-
     } catch (error) {
         console.error('❌ Server startup failed:', error);
         process.exit(1);
