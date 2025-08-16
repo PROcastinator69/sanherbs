@@ -9,14 +9,16 @@ const getAPIBaseURL = () => {
 };
 // FIXED: Remove escaped underscores
 const API_BASE_URL = getAPIBaseURL();
+
 // Global Variables
 let isSignupMode = false;
 let authToken = localStorage.getItem('authToken');
+
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🌿 SanHerbs application initializing...');
     console.log('🔗 API Base URL:', API_BASE_URL);
-
+    
     initializeNavigation();
     initializeAuth();
     initializeFilters();
@@ -25,33 +27,26 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProductOrdering();
     initializePlanSubscription();
     updateCartCount();
-
+    
     if (window.location.pathname === '/login' || window.location.pathname === '/login.html') {
         checkAuth();
     }
-
+    
     if (window.location.pathname === '/marketplace' || window.location.pathname === '/marketplace.html') {
         loadProducts();
     }
-
+    
     if (window.location.pathname === '/plans' || window.location.pathname === '/plans.html') {
         loadPlans();
     }
-    // ❌ COMMENT OUT THIS LINE TO FIX 404 ERROR
-    // if (authToken) {
-    //     loadUserProfile();
-    // }
 });
 
 function toggleAuthMode() {
     setAuthMode(!isSignupMode);
-
     const mobileInput = document.getElementById("mobile");
     const passwordInput = document.getElementById("password");
-
     if (mobileInput) mobileInput.value = "";
     if (passwordInput) passwordInput.value = "";
-
     setTimeout(() => {
         clearMessage();
     }, 1000);
@@ -64,6 +59,7 @@ function setAuthMode(isSignup) {
     const signupBtn = document.getElementById("signupBtn");
     const toggleText = document.getElementById("toggleText");
     isSignupMode = isSignup;
+    
     if (isSignupMode) {
         if (authTitle) authTitle.textContent = "Create Account";
         if (authSubtitle) authSubtitle.textContent = "Join SanHerbs today";
@@ -81,6 +77,7 @@ function setAuthMode(isSignup) {
             toggleText.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Sign up here</a>`;
         }
     }
+    
     const newToggleLink = document.getElementById("toggleLink");
     if (newToggleLink) {
         newToggleLink.addEventListener('click', (e) => {
@@ -96,6 +93,7 @@ function initializeAuth() {
     const signupBtn = document.getElementById('signupBtn');
     const toggleLink = document.getElementById('toggleLink');
     const logoutBtn = document.getElementById('logoutBtn');
+    
     setAuthMode(false);
     if (loginBtn) loginBtn.addEventListener('click', login);
     if (signupBtn) signupBtn.addEventListener('click', signup);
@@ -116,10 +114,12 @@ function initializeProductOrdering() {
             const productId = addToCartBtn.getAttribute('data-product-id');
             const image = addToCartBtn.getAttribute('data-image');
             const category = addToCartBtn.getAttribute('data-category');
+            
             if (!productName || !price) {
                 showMessage("❌ Product information missing", "error");
                 return;
             }
+            
             addToCart({
                 id: productId || `product_${Date.now()}`,
                 name: productName,
@@ -129,6 +129,7 @@ function initializeProductOrdering() {
             });
             showPopupNotification(`${productName} +1 added to cart`);
         }
+        
         const buyNowBtn = event.target.closest('.buy-now-btn');
         if (buyNowBtn) {
             event.preventDefault();
@@ -137,10 +138,12 @@ function initializeProductOrdering() {
             const productId = buyNowBtn.getAttribute('data-product-id');
             const image = buyNowBtn.getAttribute('data-image');
             const category = buyNowBtn.getAttribute('data-category');
+            
             if (!productName || !price) {
                 showMessage("❌ Product information missing", "error");
                 return;
             }
+            
             buyNow({
                 id: productId || `product_${Date.now()}`,
                 name: productName,
@@ -205,6 +208,7 @@ function addToCart(product) {
         let cart = JSON.parse(localStorage.getItem('sanherbs_cart')) ||
                   JSON.parse(localStorage.getItem('greentap_cart')) ||
                   JSON.parse(localStorage.getItem('cart')) || [];
+        
         const existingItem = cart.find(item => item.id === product.id || item.name === product.name);
         if (existingItem) {
             existingItem.quantity += 1;
@@ -219,6 +223,7 @@ function addToCart(product) {
                 addedAt: new Date().toISOString()
             });
         }
+        
         localStorage.setItem('sanherbs_cart', JSON.stringify(cart));
         localStorage.setItem('greentap_cart', JSON.stringify(cart));
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -269,6 +274,7 @@ function updateCartCount() {
                      JSON.parse(localStorage.getItem('cart')) || [];
         const cartCount = cart.reduce((total, item) => total + (parseInt(item.quantity) || 0), 0);
         const cartCountElements = document.querySelectorAll('.cart-count');
+        
         cartCountElements.forEach(element => {
             if (element) {
                 element.textContent = cartCount;
@@ -634,32 +640,48 @@ async function loadProducts() {
         if (response.success && response.products) {
             console.log('🔍 Products received:', response.products.map(p => p.name));
             renderProducts(response.products);
+        } else {
+            console.warn('⚠️ No products received from API');
+            // Clear any existing products
+            const productsContainer = document.getElementById('products-container');
+            if (productsContainer) {
+                productsContainer.innerHTML = '<p>No products available.</p>';
+            }
         }
     } catch (error) {
         console.error('🚨 Product loading error:', error);
-        // CHECK IF THIS HAS FALLBACK DUMMY PRODUCTS!
+        // Clear any existing products on error
+        const productsContainer = document.getElementById('products-container');
+        if (productsContainer) {
+            productsContainer.innerHTML = '<p>Error loading products. Please try again.</p>';
+        }
     }
 }
-
 
 function renderProducts(products) {
     const productsContainer = document.getElementById('products-container');
     if (!productsContainer) return;
+    
+    if (!products || products.length === 0) {
+        productsContainer.innerHTML = '<p>No products available.</p>';
+        return;
+    }
+    
     const productHTML = products.map(product => `
         <div class="product-card" data-category="${product.category}">
             <div class="product-image">
-                ${product.image ? `<img src="${product.image}" alt="${product.name}" loading="lazy">` : '💊'}
+                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}" loading="lazy">` : '💊'}
             </div>
             <div class="product-info">
                 <h3>${product.name}</h3>
-                <p class="product-subtitle">${product.description || 'Premium health supplement'}</p>
+                <p class="product-subtitle">${product.subtitle || product.description || 'Premium health supplement'}</p>
                 <div class="product-price">₹${parseFloat(product.price).toFixed(2)}</div>
                 <div class="product-buttons">
                     <button class="add-to-cart-btn"
                             data-product-id="${product.id}"
                             data-product="${product.name}"
                             data-price="${product.price}"
-                            data-image="${product.image}"
+                            data-image="${product.image_url || ''}"
                             data-category="${product.category}">
                         <i class="fas fa-cart-plus"></i> Add to Cart
                     </button>
@@ -667,7 +689,7 @@ function renderProducts(products) {
                             data-product-id="${product.id}"
                             data-product="${product.name}"
                             data-price="${product.price}"
-                            data-image="${product.image}"
+                            data-image="${product.image_url || ''}"
                             data-category="${product.category}">
                         Buy Now
                     </button>
@@ -675,40 +697,53 @@ function renderProducts(products) {
             </div>
         </div>
     `).join('');
+    
     productsContainer.innerHTML = productHTML;
 }
 
 async function loadPlans() {
     try {
+        console.log('🔍 Loading plans from API...');
         const response = await apiCall('/api/plans');
+        console.log('🔍 Plans API Response:', response);
+        
         if (response.success && response.plans) {
+            console.log('🔍 Plans received:', response.plans.map(p => p.name));
             renderPlans(response.plans);
+        } else {
+            console.warn('⚠️ No plans received from API');
         }
     } catch (error) {
-        // fallback logic here
+        console.error('🚨 Plans loading error:', error);
     }
 }
 
 function renderPlans(plans) {
     const plansContainer = document.getElementById('plans-container');
     if (!plansContainer) return;
+    
+    if (!plans || plans.length === 0) {
+        plansContainer.innerHTML = '<p>No plans available.</p>';
+        return;
+    }
+    
     const planHTML = plans.map(plan => `
-        <div class="plan-card ${plan.featured ? 'featured' : ''}">
+        <div class="plan-card ${plan.is_featured ? 'featured' : ''}">
             <div class="plan-header">
                 <h3>${plan.name}</h3>
                 <div class="plan-price">₹${parseFloat(plan.price).toFixed(2)}<span>/month</span></div>
             </div>
             <div class="plan-features">
-                ${(plan.features || []).map(feature => `<div class="feature">✓ ${feature}</div>`).join('')}
+                ${plan.features ? JSON.parse(plan.features).map(feature => `<div class="feature">✓ ${feature}</div>`).join('') : ''}
             </div>
-            <button class="plan-btn ${plan.featured ? 'featured' : ''}"
+            <button class="plan-btn ${plan.is_featured ? 'featured' : ''}"
                     data-plan-id="${plan.id}"
                     data-plan="${plan.name}"
                     data-price="${plan.price}">
-                ${plan.featured ? 'Choose Premium' : 'Select Plan'}
+                ${plan.is_featured ? 'Choose Premium' : 'Select Plan'}
             </button>
         </div>
     `).join('');
+    
     plansContainer.innerHTML = planHTML;
 }
-
