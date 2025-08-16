@@ -28,7 +28,7 @@ class Database {
         console.log('🔨 Creating database tables...');
         
         const tables = [
-            // Users table - FIXED VERSION
+            // Users table
             `CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 mobile VARCHAR(10) UNIQUE NOT NULL,
@@ -50,7 +50,7 @@ class Database {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`,
-            // Products table - ENHANCED VERSION
+            // Products table
             `CREATE TABLE IF NOT EXISTS products (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name VARCHAR(255) NOT NULL,
@@ -126,7 +126,7 @@ class Database {
                 FOREIGN KEY (user_id) REFERENCES users (id),
                 FOREIGN KEY (plan_id) REFERENCES subscription_plans (id)
             )`,
-            // Payments table (for Razorpay integration)
+            // Payments table
             `CREATE TABLE IF NOT EXISTS payments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 order_id INTEGER,
@@ -149,7 +149,7 @@ class Database {
         
         // Create indexes for better performance
         await this.createIndexes();
-        // Insert sample data - THIS IS THE KEY PART
+        // Insert sample data - NUCLEAR VERSION
         await this.insertSampleData();
         
         console.log('✅ Database tables created successfully');
@@ -180,73 +180,90 @@ class Database {
     }
     
     async insertSampleData() {
-        console.log('📦 FORCING CLEANUP - Removing ALL existing products...');
+        console.log('🚨 NUCLEAR OPTION - FORCE DELETING ALL PRODUCTS ON EVERY STARTUP...');
         
         try {
-            // AGGRESSIVE CLEANUP - Remove all existing products every time
-            await this.run('DELETE FROM products');
-            await this.run('DELETE FROM subscription_plans');
-            console.log('🗑️ Deleted ALL existing products and plans');
+            // NUCLEAR DELETION - DELETE ALL PRODUCTS EVERY TIME
+            await this.run('DELETE FROM products WHERE 1=1');
+            await this.run('DELETE FROM subscription_plans WHERE 1=1');
+            console.log('💥 NUCLEAR DELETION COMPLETE - ALL products and plans deleted');
             
-            // Check if ANY products exist after cleanup
-            const existingProducts = await this.get('SELECT COUNT(*) as count FROM products');
-            console.log(`🔍 Products after cleanup: ${existingProducts.count}`);
+            // Verify nuclear deletion worked
+            const count = await this.get('SELECT COUNT(*) as count FROM products');
+            console.log(`🔍 Product count after NUCLEAR deletion: ${count.count}`);
             
-            // Only insert if NO products exist
-            if (existingProducts.count === 0) {
-                // Insert only your Spirulina Capsules as the main product
-                const product = {
-                    name: 'SanHerbs Spirulina Capsules',
-                    subtitle: '60 Veg Capsules • Dietary Food Supplement',
-                    description: 'Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. FSSAI certified food supplement. Not a medicine.',
-                    price: 459,
-                    original_price: 599,
-                    category: 'food supplement',
-                    benefits: JSON.stringify([
-                        '🌿 100% Natural and Organic',
-                        '🛡️ Supports Immunity',
-                        '💪 Boosts Vitality and Energy',
-                        '🌱 Rich Plant Protein',
-                        'FSSAI Certified Food Supplement'
-                    ]),
-                    ingredients: 'Organic Spirulina Powder (500 mg per capsule)',
-                    image_url: '/images/products/spirulina.jpg',
-                    stock_quantity: 200,
-                    is_featured: 1
-                };
-                
-                await this.run(
-                    `INSERT INTO products (name, subtitle, description, price, original_price, category, benefits, ingredients, image_url, stock_quantity, is_featured, is_active) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-                    [
-                        product.name,
-                        product.subtitle,
-                        product.description,
-                        product.price,
-                        product.original_price,
-                        product.category,
-                        product.benefits,
-                        product.ingredients,
-                        product.image_url,
-                        product.stock_quantity,
-                        product.is_featured
-                    ]
-                );
-                
-                console.log('✅ SUCCESSFULLY inserted ONLY Spirulina product - all dummy products permanently removed');
-                
-                // Verify insertion
-                const finalCount = await this.get('SELECT COUNT(*) as count FROM products');
-                console.log(`🎯 Final product count: ${finalCount.count} (should be 1)`);
-                
-            } else {
-                console.log('⚠️ Products still exist after cleanup - this should not happen');
+            if (count.count > 0) {
+                console.error('🚨 NUCLEAR DELETION FAILED - products still exist!');
+                // Try alternative deletion methods
+                await this.run('DROP TABLE IF EXISTS products');
+                await this.run(`CREATE TABLE products (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name VARCHAR(255) NOT NULL,
+                    subtitle VARCHAR(255),
+                    description TEXT,
+                    price DECIMAL(10,2) NOT NULL,
+                    original_price DECIMAL(10,2),
+                    category VARCHAR(100),
+                    benefits TEXT,
+                    ingredients TEXT,
+                    image_url VARCHAR(255),
+                    stock_quantity INTEGER DEFAULT 0,
+                    is_featured INTEGER DEFAULT 0,
+                    is_active INTEGER DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )`);
+                console.log('💥 RECREATED products table from scratch');
             }
             
-            console.log('✅ Sample data insertion completed - ONLY SPIRULINA PRODUCT EXISTS');
+            // Insert ONLY Spirulina - NO OTHER PRODUCTS ALLOWED
+            const result = await this.run(`
+                INSERT INTO products (name, subtitle, description, price, original_price, category, benefits, ingredients, image_url, stock_quantity, is_featured, is_active) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+            `, [
+                'SanHerbs Spirulina Capsules',
+                '60 Veg Capsules • Dietary Food Supplement',
+                'Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. FSSAI certified food supplement.',
+                459,
+                599,
+                'food supplement',
+                JSON.stringify([
+                    '🌿 100% Natural and Organic',
+                    '🛡️ Supports Immunity', 
+                    '💪 Boosts Vitality and Energy',
+                    '🌱 Rich Plant Protein',
+                    'FSSAI Certified Food Supplement'
+                ]),
+                'Organic Spirulina Powder (500 mg per capsule)',
+                'https://sanherbs.com/images/products/spirulina.jpg',
+                200,
+                1
+            ]);
+            
+            console.log('✅ SPIRULINA INSERTION SUCCESSFUL - Product ID:', result.id);
+            
+            // Final verification - THIS MUST BE 1
+            const finalCount = await this.get('SELECT COUNT(*) as count FROM products');
+            const productName = await this.get('SELECT name FROM products LIMIT 1');
+            
+            console.log(`🎯 FINAL VERIFICATION:`);
+            console.log(`🎯 Product count: ${finalCount.count} (MUST be 1)`);
+            console.log(`🎯 Product name: ${productName?.name || 'NONE'}`);
+            
+            if (finalCount.count !== 1) {
+                console.error('🚨 FINAL VERIFICATION FAILED - Expected 1 product, got:', finalCount.count);
+                throw new Error('Product insertion verification failed');
+            }
+            
+            if (productName?.name !== 'SanHerbs Spirulina Capsules') {
+                console.error('🚨 WRONG PRODUCT INSERTED - Expected Spirulina, got:', productName?.name);
+                throw new Error('Wrong product was inserted');
+            }
+            
+            console.log('🎉 SUCCESS: ONLY SPIRULINA PRODUCT EXISTS - ALL DUMMY PRODUCTS ELIMINATED');
             
         } catch (error) {
-            console.error('❌ Error inserting sample data:', error);
+            console.error('❌ NUCLEAR INSERTION ERROR:', error);
             throw error;
         }
     }
