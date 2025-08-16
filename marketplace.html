@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanherbs - Marketplace</title>
+    <title>SanHerbs - Organic Food Supplements Marketplace | FSSAI Certified</title>
+    <meta name="description" content="Shop premium organic Spirulina capsules by SanHerbs. Natural dietary supplements, FSSAI certified food supplements for immunity and wellness.">
+    <meta name="keywords" content="organic food supplements, spirulina capsules, dietary supplements, nutraceutical products, FSSAI certified, natural health supplements">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -12,7 +14,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <h2><i class="fas fa-leaf"></i>sanherbs</h2>
+                <h2><i class="fas fa-leaf"></i> sanherbs</h2>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
@@ -21,7 +23,16 @@
                 <li><a href="cart.html" class="nav-link cart-link">
                     <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
                 </a></li>
-                <li><a href="login.html" class="nav-link login-btn">Login</a></li>
+                <li class="nav-item login-nav" style="display: block;">
+                    <a href="login.html" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </li>
+                <li class="nav-item logout-nav" style="display: none;">
+                    <button id="logoutBtn" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -34,11 +45,11 @@
     <!-- Marketplace Header -->
     <section class="marketplace-header">
         <div class="container">
-            <h1><i class="fas fa-store"></i> Health Supplements Marketplace</h1>
-            <p>Premium health supplements delivered to your doorstep</p>
+            <h1><i class="fas fa-store"></i> Organic Food Supplements Store</h1>
+            <p>Premium FSSAI certified dietary supplements delivered to your doorstep</p>
             
             <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search for supplements...">
+                <input type="text" id="searchInput" placeholder="Search for food supplements...">
                 <button class="search-btn" type="button">
                     <i class="fas fa-search"></i>
                 </button>
@@ -51,11 +62,9 @@
         <div class="container">
             <div class="filter-buttons">
                 <button class="filter-btn active" data-category="all">All Products</button>
-                <button class="filter-btn" data-category="immunity">Immunity</button>
-                <button class="filter-btn" data-category="energy">Energy</button>
-                <button class="filter-btn" data-category="vitamins">Vitamins</button>
-                <button class="filter-btn" data-category="minerals">Minerals</button>
-                <button class="filter-btn" data-category="protein">Protein</button>
+                <button class="filter-btn" data-category="food supplement">Food Supplements</button>
+                <button class="filter-btn" data-category="organic">Organic Products</button>
+                <button class="filter-btn" data-category="spirulina">Spirulina</button>
             </div>
         </div>
     </section>
@@ -63,291 +72,53 @@
     <!-- Products Section -->
     <section class="products-section">
         <div class="container">
-            <div class="products-grid">
+            <div class="products-grid" id="products-container">
                 
-                <!-- Product 1: Immunity Booster -->
-                <div class="product-card" data-category="immunity">
-                    <div class="product-badge">Best Seller</div>
-                    <div class="image-placeholder">
-                        <div class="image-text">Immunity Booster</div>
-                        <div class="image-icon">🛡️</div>
+                <!-- Main Spirulina Product -->
+                <div class="product-card" data-category="food supplement spirulina organic">
+                    <div class="product-badge">Featured Product</div>
+                    <div class="product-image">
+                        <img src="/images/products/spirulina.jpg" alt="SanHerbs Spirulina Capsules" 
+                             style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder" style="display: none;">
+                            <div class="image-text">Spirulina Capsules</div>
+                            <div class="image-icon">🌱</div>
+                        </div>
                     </div>
                     <div class="product-info">
-                        <h3>Premium Immunity Booster</h3>
-                        <p class="product-subtitle">60 Tablets • 1 Month Supply</p>
+                        <h3>SanHerbs Spirulina Capsules</h3>
+                        <p class="product-subtitle">60 Veg Capsules • Dietary Food Supplement</p>
+                        <p class="product-description">Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. FSSAI certified food supplement.</p>
                         
                         <div class="product-benefits">
-                            <span class="benefit-mini">Natural</span>
-                            <span class="benefit-mini">Lab Tested</span>
-                            <span class="benefit-mini">Fast Acting</span>
+                            <span class="benefit-mini">100% Organic</span>
+                            <span class="benefit-mini">FSSAI Certified</span>
+                            <span class="benefit-mini">Plant Protein</span>
+                            <span class="benefit-mini">Natural Food Supplement</span>
                         </div>
                         
                         <div class="product-price">
-                            <span class="current-price">₹899</span>
+                            <span class="old-price">₹599</span>
+                            <span class="current-price">₹459</span>
+                            <span class="discount-badge">Save ₹140</span>
                         </div>
                         
                         <div class="product-actions">
                             <button class="add-to-cart-btn" 
-                                    data-product="Premium Immunity Booster" 
-                                    data-price="899" 
-                                    data-product-id="immunity-booster">
+                                    data-product="SanHerbs Spirulina Capsules" 
+                                    data-price="459" 
+                                    data-product-id="spirulina-capsules"
+                                    data-category="food supplement"
+                                    data-image="/images/products/spirulina.jpg">
                                 <i class="fas fa-cart-plus"></i> Add to Cart
                             </button>
                             <button class="btn-secondary buy-now-btn" 
-                                    data-product="Premium Immunity Booster" 
-                                    data-price="899">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 2: Multivitamin -->
-                <div class="product-card" data-category="vitamins">
-                    <div class="image-placeholder">
-                        <div class="image-text">Multivitamin</div>
-                        <div class="image-icon">💊</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Complete Multivitamin</h3>
-                        <p class="product-subtitle">90 Tablets • 3 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">26 Nutrients</span>
-                            <span class="benefit-mini">Daily Support</span>
-                            <span class="benefit-mini">Energy</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹1,299</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Complete Multivitamin" 
-                                    data-price="1299" 
-                                    data-product-id="multivitamin">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Complete Multivitamin" 
-                                    data-price="1299">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 3: Omega-3 -->
-                <div class="product-card" data-category="immunity">
-                    <div class="image-placeholder">
-                        <div class="image-text">Omega-3</div>
-                        <div class="image-icon">🐟</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Pure Omega-3 Fish Oil</h3>
-                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">Heart Health</span>
-                            <span class="benefit-mini">Brain Support</span>
-                            <span class="benefit-mini">Pure</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹799</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Pure Omega-3 Fish Oil" 
-                                    data-price="799" 
-                                    data-product-id="omega-3">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Pure Omega-3 Fish Oil" 
-                                    data-price="799">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 4: Vitamin D3 -->
-                <div class="product-card" data-category="vitamins">
-                    <div class="image-placeholder">
-                        <div class="image-text">Vitamin D3</div>
-                        <div class="image-icon">☀️</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Vitamin D3 5000 IU</h3>
-                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">Bone Health</span>
-                            <span class="benefit-mini">Immunity</span>
-                            <span class="benefit-mini">High Potency</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹599</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Vitamin D3 5000 IU" 
-                                    data-price="599" 
-                                    data-product-id="vitamin-d3">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Vitamin D3 5000 IU" 
-                                    data-price="599">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 5: Probiotics -->
-                <div class="product-card" data-category="immunity">
-                    <div class="image-placeholder">
-                        <div class="image-text">Probiotics</div>
-                        <div class="image-icon">🦠</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Advanced Probiotics</h3>
-                        <p class="product-subtitle">60 Capsules • 2 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">Digestive Health</span>
-                            <span class="benefit-mini">50 Billion CFU</span>
-                            <span class="benefit-mini">10 Strains</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹1,199</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Advanced Probiotics" 
-                                    data-price="1199" 
-                                    data-product-id="probiotics">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Advanced Probiotics" 
-                                    data-price="1199">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 6: Magnesium -->
-                <div class="product-card" data-category="minerals">
-                    <div class="image-placeholder">
-                        <div class="image-text">Magnesium</div>
-                        <div class="image-icon">⚡</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Magnesium Glycinate</h3>
-                        <p class="product-subtitle">90 Capsules • 3 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">Sleep Support</span>
-                            <span class="benefit-mini">Muscle Recovery</span>
-                            <span class="benefit-mini">Gentle</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹899</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Magnesium Glycinate" 
-                                    data-price="899" 
-                                    data-product-id="magnesium">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Magnesium Glycinate" 
-                                    data-price="899">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 7: Ashwagandha -->
-                <div class="product-card" data-category="energy">
-                    <div class="image-placeholder">
-                        <div class="image-text">Ashwagandha</div>
-                        <div class="image-icon">🌿</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Organic Ashwagandha</h3>
-                        <p class="product-subtitle">60 Tablets • 2 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">Stress Relief</span>
-                            <span class="benefit-mini">Energy</span>
-                            <span class="benefit-mini">Organic</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹749</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Organic Ashwagandha" 
-                                    data-price="749" 
-                                    data-product-id="ashwagandha">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Organic Ashwagandha" 
-                                    data-price="749">
-                                <i class="fas fa-bolt"></i> Buy Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 8: Protein Powder -->
-                <div class="product-card" data-category="protein">
-                    <div class="image-placeholder">
-                        <div class="image-text">Protein Powder</div>
-                        <div class="image-icon">💪</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Whey Protein Isolate</h3>
-                        <p class="product-subtitle">500g • 1 Month Supply</p>
-                        
-                        <div class="product-benefits">
-                            <span class="benefit-mini">25g Protein</span>
-                            <span class="benefit-mini">Fast Absorption</span>
-                            <span class="benefit-mini">Chocolate</span>
-                        </div>
-                        
-                        <div class="product-price">
-                            <span class="current-price">₹1,599</span>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <button class="add-to-cart-btn" 
-                                    data-product="Whey Protein Isolate" 
-                                    data-price="1599" 
-                                    data-product-id="protein-powder">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                            <button class="btn-secondary buy-now-btn" 
-                                    data-product="Whey Protein Isolate" 
-                                    data-price="1599">
+                                    data-product="SanHerbs Spirulina Capsules" 
+                                    data-price="459"
+                                    data-product-id="spirulina-capsules"
+                                    data-category="food supplement"
+                                    data-image="/images/products/spirulina.jpg">
                                 <i class="fas fa-bolt"></i> Buy Now
                             </button>
                         </div>
@@ -355,6 +126,63 @@
                 </div>
 
             </div>
+
+            <!-- Product Details Section -->
+            <div class="product-details-section" style="margin-top: 40px;">
+                <div class="container">
+                    <div class="product-full-details">
+                        <h2>About SanHerbs Spirulina Capsules</h2>
+                        <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                            <div class="detail-card">
+                                <h4><i class="fas fa-leaf"></i> 100% Organic & Natural</h4>
+                                <p>Our Spirulina is sourced from certified organic farms and processed without any artificial additives or preservatives.</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4><i class="fas fa-certificate"></i> FSSAI Certified</h4>
+                                <p>Government approved dietary food supplement manufactured under strict quality control and safety guidelines.</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4><i class="fas fa-seedling"></i> Rich Plant Protein</h4>
+                                <p>Each capsule contains 500mg of pure Spirulina powder, providing essential amino acids and plant-based protein.</p>
+                            </div>
+                            <div class="detail-card">
+                                <h4><i class="fas fa-shield-alt"></i> Immunity Support</h4>
+                                <p>Natural food supplement that supports immune function, energy levels, and overall nutritional wellness.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Choose SanHerbs -->
+            <div class="why-choose-section" style="margin-top: 50px; background: #f9f9f9; padding: 40px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Why Choose SanHerbs Food Supplements?</h2>
+                    <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div class="feature-card" style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">🏛️</div>
+                            <h4>FSSAI Approved</h4>
+                            <p>All our dietary supplements are government certified and manufactured under strict food safety standards.</p>
+                        </div>
+                        <div class="feature-card" style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">🌱</div>
+                            <h4>100% Natural</h4>
+                            <p>Pure organic ingredients with no artificial colors, flavors, or preservatives in our food supplements.</p>
+                        </div>
+                        <div class="feature-card" style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">🚚</div>
+                            <h4>Fast Delivery</h4>
+                            <p>Quick and secure delivery of your organic food supplements across India with tracking support.</p>
+                        </div>
+                        <div class="feature-card" style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">💰</div>
+                            <h4>Best Value</h4>
+                            <p>Premium quality organic food supplements at competitive prices with regular discounts and offers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -363,13 +191,13 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>Sanherbs</h4>
-                    <p>Your trusted partner for premium health supplements and wellness solutions.</p>
+                    <h4>SanHerbs</h4>
+                    <p>Your trusted partner for premium organic food supplements and natural wellness solutions. FSSAI certified nutraceutical products.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="marketplace.html">Products</a></li>
+                        <li><a href="marketplace.html">Food Supplements</a></li>
                         <li><a href="plans.html">Subscription Plans</a></li>
                         <li><a href="orders.html">Track Orders</a></li>
                     </ul>
@@ -383,8 +211,14 @@
                     </ul>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 sanherbs. All rights reserved.</p>
+            <!-- Policy Links -->
+            <div class="footer-policies" style="margin-top:15px; text-align:center; font-size:14px;">
+                <a href="terms.html">Terms & Conditions</a> | 
+                <a href="privacy.html">Privacy Policy</a> | 
+                <a href="refund.html">Refund & Cancellation Policy</a>
+            </div>
+            <div class="footer-bottom" style="margin-top:10px;">
+                <p>&copy; 2025 SanHerbs. All rights reserved. | FSSAI Certified Food Supplements</p>
             </div>
         </div>
     </footer>
