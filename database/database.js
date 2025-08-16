@@ -149,7 +149,7 @@ class Database {
         
         // Create indexes for better performance
         await this.createIndexes();
-        // Insert sample data
+        // Insert sample data - THIS IS THE KEY PART
         await this.insertSampleData();
         
         console.log('✅ Database tables created successfully');
@@ -180,59 +180,70 @@ class Database {
     }
     
     async insertSampleData() {
-        console.log('📦 Checking for existing data...');
+        console.log('📦 FORCING CLEANUP - Removing ALL existing products...');
         
         try {
-            // Remove any existing products and plans completely
+            // AGGRESSIVE CLEANUP - Remove all existing products every time
             await this.run('DELETE FROM products');
             await this.run('DELETE FROM subscription_plans');
+            console.log('🗑️ Deleted ALL existing products and plans');
             
-            // Insert only your Spirulina Capsules as the main product
-            const product = {
-                name: 'SanHerbs Spirulina Capsules',
-                subtitle: '60 Veg Capsules • Dietary Food Supplement',
-                description: 'Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. Approved by FSSAI. Not a medicine.',
-                price: 459,
-                original_price: 599,
-                category: 'food supplement',
-                benefits: JSON.stringify([
-                    '🌿 100% Natural and Organic',
-                    '🛡️ Supports Immunity',
-                    '💪 Boosts Vitality and Energy',
-                    '🌱 Rich Plant Protein',
-                    'FSSAI Certified Food Supplement'
-                ]),
-                ingredients: 'Organic Spirulina Powder (500 mg per capsule)',
-                image_url: '/images/products/spirulina.jpg',
-                stock_quantity: 200,
-                is_featured: 1
-            };
+            // Check if ANY products exist after cleanup
+            const existingProducts = await this.get('SELECT COUNT(*) as count FROM products');
+            console.log(`🔍 Products after cleanup: ${existingProducts.count}`);
             
-            await this.run(
-                `INSERT INTO products (name, subtitle, description, price, original_price, category, benefits, ingredients, image_url, stock_quantity, is_featured, is_active) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-                [
-                    product.name,
-                    product.subtitle,
-                    product.description,
-                    product.price,
-                    product.original_price,
-                    product.category,
-                    product.benefits,
-                    product.ingredients,
-                    product.image_url,
-                    product.stock_quantity,
-                    product.is_featured
-                ]
-            );
+            // Only insert if NO products exist
+            if (existingProducts.count === 0) {
+                // Insert only your Spirulina Capsules as the main product
+                const product = {
+                    name: 'SanHerbs Spirulina Capsules',
+                    subtitle: '60 Veg Capsules • Dietary Food Supplement',
+                    description: 'Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. FSSAI certified food supplement. Not a medicine.',
+                    price: 459,
+                    original_price: 599,
+                    category: 'food supplement',
+                    benefits: JSON.stringify([
+                        '🌿 100% Natural and Organic',
+                        '🛡️ Supports Immunity',
+                        '💪 Boosts Vitality and Energy',
+                        '🌱 Rich Plant Protein',
+                        'FSSAI Certified Food Supplement'
+                    ]),
+                    ingredients: 'Organic Spirulina Powder (500 mg per capsule)',
+                    image_url: '/images/products/spirulina.jpg',
+                    stock_quantity: 200,
+                    is_featured: 1
+                };
+                
+                await this.run(
+                    `INSERT INTO products (name, subtitle, description, price, original_price, category, benefits, ingredients, image_url, stock_quantity, is_featured, is_active) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+                    [
+                        product.name,
+                        product.subtitle,
+                        product.description,
+                        product.price,
+                        product.original_price,
+                        product.category,
+                        product.benefits,
+                        product.ingredients,
+                        product.image_url,
+                        product.stock_quantity,
+                        product.is_featured
+                    ]
+                );
+                
+                console.log('✅ SUCCESSFULLY inserted ONLY Spirulina product - all dummy products permanently removed');
+                
+                // Verify insertion
+                const finalCount = await this.get('SELECT COUNT(*) as count FROM products');
+                console.log(`🎯 Final product count: ${finalCount.count} (should be 1)`);
+                
+            } else {
+                console.log('⚠️ Products still exist after cleanup - this should not happen');
+            }
             
-            console.log('✅ Inserted main Spirulina product, all previous products deleted.');
-            
-            // Optionally, update subscription plans similarly or clear
-            await this.run('DELETE FROM subscription_plans');
-            // (You can add a plan for Spirulina if desired)
-            
-            console.log('✅ Sample data insertion completed successfully');
+            console.log('✅ Sample data insertion completed - ONLY SPIRULINA PRODUCT EXISTS');
             
         } catch (error) {
             console.error('❌ Error inserting sample data:', error);
