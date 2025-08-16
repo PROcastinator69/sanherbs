@@ -6,7 +6,7 @@ const smsService = require('../services/smsservice');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 
-// Create payment order
+// Create payment order - SECURE VERSION
 router.post('/create-order', authenticateToken, [
     body('amount').isNumeric().withMessage('Amount must be a number'),
     body('items').isArray().withMessage('Items must be an array'),
@@ -40,26 +40,38 @@ router.post('/create-order', authenticateToken, [
             });
         }
 
-        // Save order to database - FIXED VERSION using promisified methods
+        // Save order to database
         const dbResult = await req.db.run(`
             INSERT INTO orders (
-                id, user_id, razorpay_order_id, amount, status, 
-                items, customer_name, customer_email, customer_phone,
-                delivery_address, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                order_number, user_id, razorpay_order_id, total_amount, status, 
+                delivery_address, contact_number, notes, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
             orderId,
-            req.user.userId, // Using userId from your auth middleware
+            req.user.userId,
             razorpayResult.order.id,
             amount,
             'created',
-            JSON.stringify(items),
-            customerDetails.name,
-            customerDetails.email,
-            customerDetails.phone,
-            JSON.stringify(deliveryAddress),
+            JSON.stringify(deliveryAddress || {}),
+            customerDetails.phone || null,
+            JSON.stringify({ items, customerDetails }),
             new Date().toISOString()
         ]);
+
+        // Save order items
+        for (const item of items) {
+            await req.db.run(`
+                INSERT INTO order_items (
+                    order_id, product_name, quantity, unit_price, total_price
+                ) VALUES (?, ?, ?, ?, ?)
+            `, [
+                dbResult.id,
+                item.name,
+                item.quantity || 1,
+                item.price,
+                (item.quantity || 1) * item.price
+            ]);
+        }
 
         console.log('✅ Order created with ID:', orderId);
 
@@ -82,7 +94,7 @@ router.post('/create-order', authenticateToken, [
     }
 });
 
-// Verify payment - FIXED VERSION
+// Verify payment - SECURE VERSION
 router.post('/verify-payment', [
     body('razorpay_order_id').notEmpty(),
     body('razorpay_payment_id').notEmpty(),
@@ -108,75 +120,86 @@ router.post('/verify-payment', [
         );
 
         if (!isValidSignature) {
-            // Update order status to failed - FIXED VERSION
             await req.db.run(
-                'UPDATE orders SET status = ?, updated_at = ? WHERE id = ?',
+                'UPDATE orders SET status = ?, updated_at = ? WHERE order_number = ?',
                 ['payment_failed', new Date().toISOString(), orderId]
             );
-
             return res.status(400).json({
                 success: false,
                 message: 'Payment verification failed'
             });
         }
 
-        // Get payment details
+        // Get payment details from Razorpay
         const paymentDetails = await razorpayService.getPaymentDetails(razorpay_payment_id);
 
-        // Save payment record - FIXED VERSION
-        const paymentId = `PAY_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+        // Get order from database
+        const order = await req.db.get('SELECT * FROM orders WHERE order_number = ?', [orderId]);
         
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Save payment record
         await req.db.run(`
             INSERT INTO payments (
-                id, order_id, razorpay_payment_id, amount, currency,
-                method, status, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                order_id, razorpay_order_id, razorpay_payment_id, razorpay_signature,
+                amount, currency, method, status, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
-            paymentId,
-            orderId,
+            order.id,
+            razorpay_order_id,
             razorpay_payment_id,
-            paymentDetails.payment?.amount / 100 || 0,
+            razorpay_signature,
+            paymentDetails.payment?.amount / 100 || order.total_amount,
             paymentDetails.payment?.currency || 'INR',
             paymentDetails.payment?.method || 'unknown',
             'completed',
             new Date().toISOString()
         ]);
 
-        // Update order status - FIXED VERSION
+        // Update order status
         await req.db.run(
-            'UPDATE orders SET status = ?, payment_id = ?, updated_at = ? WHERE id = ?',
-            ['paid', paymentId, new Date().toISOString(), orderId]
+            'UPDATE orders SET status = ?, payment_status = ?, updated_at = ? WHERE id = ?',
+            ['processing', 'completed', new Date().toISOString(), order.id]
         );
 
-        // Get order details for notifications - FIXED VERSION
-        const order = await req.db.get('SELECT * FROM orders WHERE id = ?', [orderId]);
+        // Send notifications
+        if (order.notes) {
+            try {
+                const orderData = JSON.parse(order.notes);
+                const customerDetails = orderData.customerDetails;
 
-        if (order) {
-            // Send confirmation email and SMS
-            const orderDetails = {
-                orderId: order.id,
-                amount: order.amount,
-                status: 'Order Confirmed',
-                items: JSON.parse(order.items || '[]').map(item => item.name).join(', '),
-                address: JSON.parse(order.delivery_address || '{}')
-            };
+                const orderDetails = {
+                    orderId: order.order_number,
+                    amount: order.total_amount,
+                    status: 'Order Confirmed',
+                    items: orderData.items?.map(item => item.name).join(', ') || 'Items',
+                    address: JSON.parse(order.delivery_address || '{}')
+                };
 
-            // Send email notification
-            if (order.customer_email) {
-                try {
-                    await emailService.sendOrderConfirmation(order.customer_email, orderDetails);
-                } catch (emailError) {
-                    console.error('Email notification error:', emailError);
+                // Send email notification
+                if (customerDetails?.email) {
+                    try {
+                        await emailService.sendOrderConfirmation(customerDetails.email, orderDetails);
+                    } catch (emailError) {
+                        console.error('Email notification error:', emailError);
+                    }
                 }
-            }
 
-            // Send SMS notification
-            if (order.customer_phone) {
-                try {
-                    await smsService.sendOrderConfirmation(order.customer_phone, orderDetails);
-                } catch (smsError) {
-                    console.error('SMS notification error:', smsError);
+                // Send SMS notification (if SMS service is enabled)
+                if (customerDetails?.phone && process.env.TWILIO_ACCOUNT_SID) {
+                    try {
+                        await smsService.sendOrderConfirmation(customerDetails.phone, orderDetails);
+                    } catch (smsError) {
+                        console.error('SMS notification error:', smsError);
+                    }
                 }
+            } catch (parseError) {
+                console.error('Error parsing order data for notifications:', parseError);
             }
         }
 
@@ -186,7 +209,7 @@ router.post('/verify-payment', [
             success: true,
             message: 'Payment verified successfully',
             orderId: orderId,
-            paymentId: paymentId
+            status: 'confirmed'
         });
 
     } catch (error) {
@@ -199,15 +222,17 @@ router.post('/verify-payment', [
     }
 });
 
-// Get payment history - FIXED VERSION
+// Get payment history - SECURE VERSION
 router.get('/history', authenticateToken, async (req, res) => {
     try {
         const payments = await req.db.all(`
-            SELECT p.*, o.customer_name, o.items 
+            SELECT p.*, o.order_number, o.total_amount, o.status as order_status,
+                   o.created_at as order_date
             FROM payments p 
             JOIN orders o ON p.order_id = o.id 
             WHERE o.user_id = ? 
             ORDER BY p.created_at DESC
+            LIMIT 50
         `, [req.user.userId]);
 
         res.json({
@@ -225,7 +250,7 @@ router.get('/history', authenticateToken, async (req, res) => {
     }
 });
 
-// Refund payment - FIXED VERSION
+// Refund payment - SECURE VERSION
 router.post('/refund', authenticateToken, [
     body('orderId').notEmpty(),
     body('reason').notEmpty()
@@ -241,9 +266,9 @@ router.post('/refund', authenticateToken, [
 
         const { orderId, reason } = req.body;
 
-        // Get order details - FIXED VERSION
+        // Get order details
         const order = await req.db.get(
-            'SELECT * FROM orders WHERE id = ? AND user_id = ?', 
+            'SELECT * FROM orders WHERE order_number = ? AND user_id = ?', 
             [orderId, req.user.userId]
         );
 
@@ -254,23 +279,32 @@ router.post('/refund', authenticateToken, [
             });
         }
 
-        // Get payment details - FIXED VERSION
+        // Check if order is eligible for refund
+        if (!['processing', 'confirmed'].includes(order.status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order is not eligible for refund'
+            });
+        }
+
+        // Get payment details
         const payment = await req.db.get(
-            'SELECT * FROM payments WHERE order_id = ?', 
-            [orderId]
+            'SELECT * FROM payments WHERE order_id = ? AND status = ?', 
+            [order.id, 'completed']
         );
 
         if (!payment) {
             return res.status(404).json({
                 success: false,
-                message: 'Payment not found'
+                message: 'No completed payment found for this order'
             });
         }
 
-        // Process refund
+        // Process refund through Razorpay
         const refundResult = await razorpayService.refundPayment(
             payment.razorpay_payment_id,
-            payment.amount * 100 // Convert to paise for Razorpay
+            payment.amount * 100, // Convert to paise for Razorpay
+            reason
         );
 
         if (!refundResult.success) {
@@ -281,10 +315,10 @@ router.post('/refund', authenticateToken, [
             });
         }
 
-        // Update order and payment status - FIXED VERSION
+        // Update order and payment status
         await req.db.run(
             'UPDATE orders SET status = ?, updated_at = ? WHERE id = ?',
-            ['refunded', new Date().toISOString(), orderId]
+            ['refunded', new Date().toISOString(), order.id]
         );
 
         await req.db.run(
@@ -297,7 +331,7 @@ router.post('/refund', authenticateToken, [
         res.json({
             success: true,
             message: 'Refund processed successfully',
-            refundId: refundResult.refund.id
+            refundId: refundResult.refund?.id || 'PENDING'
         });
 
     } catch (error) {
@@ -310,16 +344,17 @@ router.post('/refund', authenticateToken, [
     }
 });
 
-// Get order details
+// Get order details - SECURE VERSION
 router.get('/order/:orderId', authenticateToken, async (req, res) => {
     try {
         const { orderId } = req.params;
-
+        
         const order = await req.db.get(`
-            SELECT o.*, p.razorpay_payment_id, p.method as payment_method
+            SELECT o.*, p.razorpay_payment_id, p.method as payment_method,
+                   p.status as payment_status
             FROM orders o
             LEFT JOIN payments p ON o.id = p.order_id
-            WHERE o.id = ? AND o.user_id = ?
+            WHERE o.order_number = ? AND o.user_id = ?
         `, [orderId, req.user.userId]);
 
         if (!order) {
@@ -329,12 +364,19 @@ router.get('/order/:orderId', authenticateToken, async (req, res) => {
             });
         }
 
+        // Get order items
+        const orderItems = await req.db.all(
+            'SELECT * FROM order_items WHERE order_id = ?',
+            [order.id]
+        );
+
         res.json({
             success: true,
             order: {
                 ...order,
-                items: JSON.parse(order.items || '[]'),
-                delivery_address: JSON.parse(order.delivery_address || '{}')
+                items: orderItems,
+                delivery_address: JSON.parse(order.delivery_address || '{}'),
+                notes: order.notes ? JSON.parse(order.notes) : null
             }
         });
 
@@ -349,4 +391,3 @@ router.get('/order/:orderId', authenticateToken, async (req, res) => {
 });
 
 module.exports = router;
-
