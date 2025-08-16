@@ -1,21 +1,18 @@
 const jwt = require('jsonwebtoken');
 const database = require('../database/database'); // Import database singleton
-
 const JWT_SECRET = process.env.JWT_SECRET || 'greentap-health-secret-key-2025';
 
-// Verify JWT token
+// JWT authentication middleware
 const authenticateToken = (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
         if (!token) {
             return res.status(401).json({
                 success: false,
                 message: 'Access token required'
             });
         }
-
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
             if (err) {
                 console.error('Token verification error:', err);
@@ -24,20 +21,16 @@ const authenticateToken = (req, res, next) => {
                     message: 'Invalid or expired token'
                 });
             }
-
-            // Add user info to request
             req.user = {
                 id: decoded.userId,
-                userId: decoded.userId, // For backward compatibility
+                userId: decoded.userId, // Backward compatibility
                 mobile: decoded.mobile,
                 firstName: decoded.firstName,
                 email: decoded.email,
                 role: decoded.role
             };
-
             next();
         });
-
     } catch (error) {
         console.error('Authentication middleware error:', error);
         return res.status(500).json({
@@ -47,17 +40,15 @@ const authenticateToken = (req, res, next) => {
     }
 };
 
-// Optional authentication (doesn't fail if no token)
+// Optional JWT authentication
 const optionalAuth = (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
-
         if (!token) {
             req.user = null;
             return next();
         }
-
         jwt.verify(token, JWT_SECRET, (err, decoded) => {
             if (err) {
                 req.user = null;
@@ -73,7 +64,6 @@ const optionalAuth = (req, res, next) => {
             }
             next();
         });
-
     } catch (error) {
         req.user = null;
         next();
@@ -83,19 +73,17 @@ const optionalAuth = (req, res, next) => {
 // Admin authentication
 const authenticateAdmin = async (req, res, next) => {
     try {
-        // First authenticate the token
+        // First authenticate token
         authenticateToken(req, res, async () => {
             try {
                 // Check if user is admin using async/await
                 const user = await req.db.get('SELECT role FROM users WHERE id = ? AND is_active = 1', [req.user.id]);
-
                 if (!user || user.role !== 'admin') {
                     return res.status(403).json({
                         success: false,
                         message: 'Admin access required'
                     });
                 }
-
                 next();
             } catch (dbError) {
                 console.error('Database error in admin auth:', dbError);
@@ -105,7 +93,6 @@ const authenticateAdmin = async (req, res, next) => {
                 });
             }
         });
-
     } catch (error) {
         console.error('Admin authentication error:', error);
         return res.status(500).json({
@@ -115,15 +102,13 @@ const authenticateAdmin = async (req, res, next) => {
     }
 };
 
-// Rate limiting middleware
+// Simple rate limiting middleware (supplement to express-rate-limit)
 const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
     const requests = new Map();
-
     return (req, res, next) => {
         const clientId = req.ip || req.connection.remoteAddress;
         const now = Date.now();
         const windowStart = now - windowMs;
-
         // Clean old entries
         for (const [key, timestamps] of requests.entries()) {
             requests.set(key, timestamps.filter(time => time > windowStart));
@@ -131,14 +116,12 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
                 requests.delete(key);
             }
         }
-
         // Check current client requests
         if (!requests.has(clientId)) {
             requests.set(clientId, []);
         }
-
         const clientRequests = requests.get(clientId);
-        
+
         if (clientRequests.length >= maxRequests) {
             return res.status(429).json({
                 success: false,
@@ -146,10 +129,8 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
                 retryAfter: Math.ceil(windowMs / 1000)
             });
         }
-
         clientRequests.push(now);
         requests.set(clientId, clientRequests);
-
         next();
     };
 };
@@ -159,20 +140,16 @@ const authenticateAPIKey = (req, res, next) => {
     try {
         const apiKey = req.headers['x-api-key'];
         const validAPIKey = process.env.API_KEY;
-
         if (!validAPIKey) {
             console.warn('API_KEY not configured in environment');
         }
-
         if (!apiKey || (validAPIKey && apiKey !== validAPIKey)) {
             return res.status(401).json({
                 success: false,
                 message: 'Valid API key required'
             });
         }
-
         next();
-
     } catch (error) {
         console.error('API key authentication error:', error);
         return res.status(500).json({
@@ -182,7 +159,7 @@ const authenticateAPIKey = (req, res, next) => {
     }
 };
 
-// Database connection middleware - FIXED VERSION
+// Database connection middleware
 const attachDatabase = (req, res, next) => {
     try {
         req.db = database; // Attach the initialized database instance
@@ -202,7 +179,6 @@ const corsMiddleware = (req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-api-key');
     res.header('Access-Control-Allow-Credentials', true);
-
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);
     } else {
@@ -213,12 +189,10 @@ const corsMiddleware = (req, res, next) => {
 // Request logging middleware
 const requestLogger = (req, res, next) => {
     const start = Date.now();
-    
     res.on('finish', () => {
         const duration = Date.now() - start;
         console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`);
     });
-    
     next();
 };
 
