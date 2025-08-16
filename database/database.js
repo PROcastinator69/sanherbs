@@ -6,22 +6,23 @@ class Database {
         this.db = null;
     }
 
-    async init() {
-        return new Promise((resolve, reject) => {
-            const dbPath = path.join(__dirname, 'greentap.db');
-            console.log('🔗 Initializing database at:', dbPath);
-            
-            this.db = new sqlite3.Database(dbPath, (err) => {
-                if (err) {
-                    console.error('❌ Error opening database:', err);
-                    reject(err);
-                } else {
-                    console.log('✅ Connected to SQLite database');
-                    this.createTables().then(resolve).catch(reject);
-                }
-            });
+   async init() {
+    return new Promise((resolve, reject) => {
+        // Use .env DB_PATH variable if set for deploy
+        const dbPath = process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.join(__dirname, 'greentap.db');
+        console.log('🔗 Initializing database at:', dbPath);
+        this.db = new sqlite3.Database(dbPath, (err) => {
+            if (err) {
+                console.error('❌ Error opening database:', err);
+                reject(err);
+            } else {
+                console.log('✅ Connected to SQLite database');
+                this.createTables().then(resolve).catch(reject);
+            }
         });
-    }
+    });
+}
+
 
     async createTables() {
         console.log('🔨 Creating database tables...');
@@ -493,3 +494,4 @@ class Database {
 const database = new Database();
 
 module.exports = database;
+
