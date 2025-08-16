@@ -3,7 +3,19 @@ const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const razorpayService = require('../services/razorpay');
 const emailService = require('../services/emailservice');
+// Import SMS service (disabled)
 const smsService = require('../services/smsservice');
+
+// In your order creation function, change this:
+// await smsService.sendOrderNotification(userPhone, orderData);
+
+// To this:
+try {
+    await smsService.sendOrderNotification(userPhone, orderData);
+} catch (error) {
+    console.log('SMS notification failed (service disabled):', error.message);
+}
+
 const shiprocketService = require('../services/shiprocket');
 
 // Middleware to verify JWT token (your existing middleware)
@@ -349,5 +361,6 @@ router.post('/whatsapp', async (req, res) => {
 });
 
 module.exports = router;
+
 
 
