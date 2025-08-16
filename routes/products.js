@@ -214,3 +214,46 @@ router.put('/:id/stock', async (req, res) => {
 });
 
 module.exports = router;
+// EMERGENCY: Nuclear product reset
+router.post('/admin/nuclear-reset', async (req, res) => {
+    try {
+        console.log('🚨 EMERGENCY NUCLEAR RESET TRIGGERED');
+        
+        // Nuclear deletion
+        await req.db.run('DELETE FROM products WHERE 1=1');
+        await req.db.run('DELETE FROM subscription_plans WHERE 1=1');
+        
+        // Insert only Spirulina
+        const result = await req.db.run(`
+            INSERT INTO products (name, subtitle, description, price, original_price, category, benefits, ingredients, image_url, stock_quantity, is_featured, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        `, [
+            'SanHerbs Spirulina Capsules',
+            '60 Veg Capsules • Dietary Food Supplement',
+            'Proudly organic Spirulina capsules by SanHerbs. Natural nutraceutical supplement to support daily nutritional needs, immunity, and vitality. FSSAI certified food supplement.',
+            459, 599, 'food supplement',
+            JSON.stringify(['🌿 100% Natural and Organic', '🛡️ Supports Immunity', '💪 Boosts Vitality and Energy', '🌱 Rich Plant Protein', 'FSSAI Certified Food Supplement']),
+            'Organic Spirulina Powder (500 mg per capsule)',
+            'https://sanherbs.com/images/products/spirulina.jpg',
+            200, 1
+        ]);
+        
+        // Verify
+        const count = await req.db.get('SELECT COUNT(*) as count FROM products');
+        const product = await req.db.get('SELECT name FROM products LIMIT 1');
+        
+        console.log(`💥 NUCLEAR RESET COMPLETE: ${count.count} products, name: ${product?.name}`);
+        
+        res.json({ 
+            success: true, 
+            message: 'Nuclear reset complete',
+            products: count.count,
+            productName: product?.name
+        });
+        
+    } catch (error) {
+        console.error('Nuclear reset error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
