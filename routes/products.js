@@ -206,7 +206,7 @@ router.put('/:id/stock', async (req, res) => {
     }
 });
 
-// EMERGENCY: Nuclear product reset - MOVED BEFORE module.exports
+// EMERGENCY: Nuclear product reset - CORRECT SYNTAX
 router.post('/admin/nuclear-reset', async (req, res) => {
     try {
         console.log('🚨 EMERGENCY NUCLEAR RESET TRIGGERED');
@@ -249,4 +249,4 @@ router.post('/admin/nuclear-reset', async (req, res) => {
     }
 });
 
-module.exports = router;  // ← This MUST be the last line
+module.exports = router;
