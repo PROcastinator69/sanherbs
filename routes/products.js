@@ -8,43 +8,42 @@ router.get('/', async (req, res) => {
         
         let sql = 'SELECT * FROM products WHERE is_active = 1';
         let params = [];
-
+        
         // Add category filter
         if (category && category !== 'all') {
             sql += ' AND category LIKE ?';
             params.push(`%${category}%`);
         }
-
+        
         // Add search filter
         if (search) {
             sql += ' AND (name LIKE ? OR description LIKE ?)';
             params.push(`%${search}%`, `%${search}%`);
         }
-
+        
         // Add featured filter
         if (featured === 'true') {
             sql += ' AND is_featured = 1';
         }
-
+        
         // Add ordering and pagination
         sql += ' ORDER BY is_featured DESC, created_at DESC LIMIT ? OFFSET ?';
         params.push(parseInt(limit), parseInt(offset));
-
+        
         const products = await req.db.all(sql, params);
-
+        
         // Parse benefits JSON for each product
         const formattedProducts = products.map(product => ({
             ...product,
             benefits: product.benefits ? JSON.parse(product.benefits) : [],
             categoryList: product.category ? product.category.split(',') : []
         }));
-
+        
         res.json({
             success: true,
             products: formattedProducts,
             count: formattedProducts.length
         });
-
     } catch (error) {
         console.error('Products fetch error:', error);
         res.status(500).json({
@@ -58,31 +57,29 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-
         const product = await req.db.get(
             'SELECT * FROM products WHERE id = ? AND is_active = 1',
             [id]
         );
-
+        
         if (!product) {
             return res.status(404).json({
                 success: false,
                 message: 'Product not found'
             });
         }
-
+        
         // Parse benefits JSON
         const formattedProduct = {
             ...product,
             benefits: product.benefits ? JSON.parse(product.benefits) : [],
             categoryList: product.category ? product.category.split(',') : []
         };
-
+        
         res.json({
             success: true,
             product: formattedProduct
         });
-
     } catch (error) {
         console.error('Product fetch error:', error);
         res.status(500).json({
@@ -98,18 +95,17 @@ router.get('/featured/list', async (req, res) => {
         const products = await req.db.all(
             'SELECT * FROM products WHERE is_featured = 1 AND is_active = 1 ORDER BY created_at DESC LIMIT 5'
         );
-
+        
         const formattedProducts = products.map(product => ({
             ...product,
             benefits: product.benefits ? JSON.parse(product.benefits) : [],
             categoryList: product.category ? product.category.split(',') : []
         }));
-
+        
         res.json({
             success: true,
             products: formattedProducts
         });
-
     } catch (error) {
         console.error('Featured products fetch error:', error);
         res.status(500).json({
@@ -125,7 +121,7 @@ router.get('/categories/list', async (req, res) => {
         const products = await req.db.all(
             'SELECT DISTINCT category FROM products WHERE is_active = 1 AND category IS NOT NULL'
         );
-
+        
         const categories = new Set();
         
         products.forEach(product => {
@@ -135,13 +131,13 @@ router.get('/categories/list', async (req, res) => {
                 });
             }
         });
-
+        
         const categoryList = Array.from(categories).map(category => ({
             value: category,
             label: category.charAt(0).toUpperCase() + category.slice(1),
-            count: 0 // You can calculate actual count if needed
+            count: 0
         }));
-
+        
         res.json({
             success: true,
             categories: [
@@ -149,7 +145,6 @@ router.get('/categories/list', async (req, res) => {
                 ...categoryList
             ]
         });
-
     } catch (error) {
         console.error('Categories fetch error:', error);
         res.status(500).json({
@@ -159,21 +154,20 @@ router.get('/categories/list', async (req, res) => {
     }
 });
 
-// Update product stock (for inventory management)
+// Update product stock
 router.put('/:id/stock', async (req, res) => {
     try {
         const { id } = req.params;
-        const { quantity, operation = 'set' } = req.body; // operation: 'set', 'add', 'subtract'
-
+        const { quantity, operation = 'set' } = req.body;
+        
         if (!quantity && quantity !== 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Quantity is required'
             });
         }
-
+        
         let sql, params;
-
         if (operation === 'set') {
             sql = 'UPDATE products SET stock_quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
             params = [quantity, id];
@@ -189,21 +183,20 @@ router.put('/:id/stock', async (req, res) => {
                 message: 'Invalid operation. Use "set", "add", or "subtract"'
             });
         }
-
+        
         const result = await req.db.run(sql, params);
-
+        
         if (result.changes === 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Product not found or insufficient stock'
             });
         }
-
+        
         res.json({
             success: true,
             message: 'Stock updated successfully'
         });
-
     } catch (error) {
         console.error('Stock update error:', error);
         res.status(500).json({
@@ -213,8 +206,7 @@ router.put('/:id/stock', async (req, res) => {
     }
 });
 
-module.exports = router;
-// EMERGENCY: Nuclear product reset
+// EMERGENCY: Nuclear product reset - MOVED BEFORE module.exports
 router.post('/admin/nuclear-reset', async (req, res) => {
     try {
         console.log('🚨 EMERGENCY NUCLEAR RESET TRIGGERED');
@@ -257,3 +249,4 @@ router.post('/admin/nuclear-reset', async (req, res) => {
     }
 });
 
+module.exports = router;  // ← This MUST be the last line
