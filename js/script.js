@@ -626,14 +626,21 @@ function checkAuth() {
 
 async function loadProducts() {
     try {
+        console.log('🔍 Loading products from API...');
         const response = await apiCall('/api/products');
+        console.log('🔍 API Response:', response);
+        console.log('🔍 Product count:', response.products?.length);
+        
         if (response.success && response.products) {
+            console.log('🔍 Products received:', response.products.map(p => p.name));
             renderProducts(response.products);
         }
     } catch (error) {
-        // fallback logic here
+        console.error('🚨 Product loading error:', error);
+        // CHECK IF THIS HAS FALLBACK DUMMY PRODUCTS!
     }
 }
+
 
 function renderProducts(products) {
     const productsContainer = document.getElementById('products-container');
@@ -704,3 +711,4 @@ function renderPlans(plans) {
     `).join('');
     plansContainer.innerHTML = planHTML;
 }
+
