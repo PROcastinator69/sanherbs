@@ -107,7 +107,7 @@ async function startServer() {
         app.use('/api/auth', require('./routes/auth'));
         app.use('/api/products', require('./routes/products'));
         app.use('/api/plans', require('./routes/plans'));
-        app.use('/api/orders', require('./routes/orders'));
+      //  app.use('/api/orders', require('./routes/orders'));//
         app.use('/api/payments', require('./routes/payments'));
         app.use('/api/tracking', require('./routes/tracking'));
         app.use('/api/users', require('./routes/users'));
@@ -338,3 +338,4 @@ async function startServer() {
 startServer();
 
 module.exports = app;
+
