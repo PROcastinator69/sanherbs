@@ -1,10 +1,8 @@
--- Product categories for GreenTap Health
+-- Product categories for SanHerbs Food Supplements
 -- Note: Categories are stored as text in products table, this is for reference
-
 -- Sample category data that will be used in products
--- Categories: 'vitamins', 'minerals', 'proteins', 'herbal', 'immunity', 'weight-management', 'fitness', 'wellness'
+-- Categories: 'food supplement', 'organic', 'spirulina', 'natural', 'dietary supplements'
 
--- You can create a categories table if you want to manage categories separately
 CREATE TABLE IF NOT EXISTS categories (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
@@ -18,15 +16,18 @@ CREATE TABLE IF NOT EXISTS categories (
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
--- Insert category data
-INSERT OR IGNORE INTO categories (id, name, description, slug) VALUES 
-('CAT_001', 'Vitamins', 'Essential vitamins for daily health', 'vitamins'),
-('CAT_002', 'Minerals', 'Important minerals for body functions', 'minerals'),
-('CAT_003', 'Proteins', 'Protein supplements for muscle growth', 'proteins'),
-('CAT_004', 'Herbal', 'Natural herbal health supplements', 'herbal'),
-('CAT_005', 'Immunity', 'Boost your immune system naturally', 'immunity'),
-('CAT_006', 'Weight Management', 'Supplements for healthy weight management', 'weight-management'),
-('CAT_007', 'Fitness', 'Pre and post workout supplements', 'fitness'),
-('CAT_008', 'Wellness', 'General wellness and health supplements', 'wellness'),
-('CAT_009', 'Digestive Health', 'Supplements for better digestion', 'digestive-health'),
-('CAT_010', 'Heart Health', 'Cardiovascular health supplements', 'heart-health');
+-- Clear existing categories and insert food supplement categories
+DELETE FROM categories;
+
+-- Insert food supplement category data
+INSERT OR IGNORE INTO categories (id, name, description, slug, display_order) VALUES 
+('CAT_001', 'Food Supplements', 'FSSAI certified dietary food supplements', 'food-supplements', 1),
+('CAT_002', 'Organic Products', 'Certified organic food supplements', 'organic', 2),
+('CAT_003', 'Spirulina', 'Premium Spirulina food supplements', 'spirulina', 3),
+('CAT_004', 'Natural Supplements', 'Natural dietary food supplements', 'natural', 4),
+('CAT_005', 'Plant Protein', 'Plant-based protein food supplements', 'plant-protein', 5),
+('CAT_006', 'Immunity Support', 'Natural immunity supporting food supplements', 'immunity-support', 6),
+('CAT_007', 'Wellness', 'General wellness food supplements', 'wellness', 7),
+('CAT_008', 'Nutraceuticals', 'Science-backed nutraceutical products', 'nutraceuticals', 8),
+('CAT_009', 'Dietary Supplements', 'FSSAI approved dietary supplements', 'dietary-supplements', 9),
+('CAT_010', 'Nutritional Support', 'Daily nutritional support supplements', 'nutritional-support', 10);
