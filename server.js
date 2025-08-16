@@ -12,21 +12,47 @@ const database = require('./database/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
+// ✅ HTTPS REDIRECT MIDDLEWARE - Forces SSL
+app.use((req, res, next) => {
+  if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+    return res.redirect(301, `https://${req.header('host')}${req.url}`);
+  }
+  next();
+});
+
+// ✅ ENHANCED SECURITY HEADERS - SSL Security
 app.use(helmet({
     contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    hsts: { 
+        maxAge: 31536000, 
+        includeSubDomains: true,
+        preload: true 
+    },
+    frameguard: { action: 'deny' },
+    noSniff: true,
+    xssFilter: true
 }));
 
-// CORS configuration - FIXED for SanHerbs
+// ✅ ADDITIONAL SECURITY HEADERS
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    next();
+});
+
+// CORS configuration - UPDATED for HTTPS
 app.use(cors({
     origin: [
-        'http://sanherbs.com',      // ✅ ADDED HTTP VERSION
-        'https://sanherbs.com',
-        'http://www.sanherbs.com',  // ✅ ADDED HTTP VERSION  
-        'https://www.sanherbs.com',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000'
+        'https://sanherbs.com',        // ✅ HTTPS FIRST
+        'https://www.sanherbs.com',    // ✅ HTTPS FIRST
+        'http://sanherbs.com',         // Fallback for redirects
+        'http://www.sanherbs.com',     // Fallback for redirects
+        'http://localhost:3000',       // Development
+        'http://127.0.0.1:3000'        // Development
     ],
     credentials: true,
     optionsSuccessStatus: 200,
@@ -34,12 +60,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Handle preflight OPTIONS requests - FIXED
+// Handle preflight OPTIONS requests
 app.options('*', cors());
 
-// Rate limiting - FIXED
+// Rate limiting - Enhanced for security
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  // ✅ FIXED: Remove escaped \
+    windowMs: 15 * 60 * 1000,  // 15 minutes
     max: 200,
     message: {
         success: false,
@@ -47,7 +73,10 @@ const limiter = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    skip: (req) => req.path === '/api/health'
+    skip: (req) => req.path === '/api/health',
+    keyGenerator: (req) => {
+        return req.ip || req.connection.remoteAddress;
+    }
 });
 app.use('/api/', limiter);
 
@@ -74,7 +103,7 @@ async function startServer() {
         await database.init();
         console.log('✅ Database initialized successfully');
 
-        // ✅ API Routes MUST come BEFORE any catch-all redirects
+        // API Routes
         app.use('/api/auth', require('./routes/auth'));
         app.use('/api/products', require('./routes/products'));
         app.use('/api/plans', require('./routes/plans'));
@@ -94,14 +123,16 @@ async function startServer() {
                     success: true,
                     message: 'SanHerbs API is running',
                     timestamp: new Date().toISOString(),
-                    environment: process.env.NODE_ENV || 'development',  // ✅ FIXED
+                    environment: process.env.NODE_ENV || 'development',
+                    ssl_enabled: req.secure || req.header('x-forwarded-proto') === 'https',
                     database: dbHealth,
-                    database_stats: dbStats,  // ✅ FIXED
+                    database_stats: dbStats,
                     services: {
-                        razorpay: !!process.env.RAZORPAY_KEY_ID,  // ✅ FIXED
-                        email: !!process.env.EMAIL_USER,  // ✅ FIXED
-                        sms: !!process.env.TWILIO_ACCOUNT_SID,  // ✅ FIXED
-                        shipping: !!process.env.SHIPROCKET_EMAIL  // ✅ FIXED
+                        razorpay: !!process.env.RAZORPAY_KEY_ID,
+                        email: !!process.env.EMAIL_USER,
+                        sms: !!process.env.TWILIO_ACCOUNT_SID,
+                        shipping: !!process.env.SHIPROCKET_EMAIL,
+                        jwt_configured: !!process.env.JWT_SECRET
                     }
                 });
             } catch (error) {
@@ -114,17 +145,19 @@ async function startServer() {
             }
         });
 
-        // ✅ API-only root endpoint
+        // API-only root endpoint
         app.get('/', (req, res) => {
             res.json({
                 message: '🌿 SanHerbs API Server',
                 status: 'Running',
                 version: '1.0.0',
+                ssl_enabled: req.secure || req.header('x-forwarded-proto') === 'https',
                 website: 'https://sanherbs.com',
                 architecture: {
                     frontend: 'GitHub Pages (sanherbs.com)',
-                    backend: 'Render API Server',
-                    database: 'SQLite'
+                    backend: 'Render API Server with SSL',
+                    database: 'SQLite',
+                    security: 'HTTPS + JWT + bcrypt'
                 },
                 endpoints: {
                     health: '/api/health',
@@ -146,6 +179,7 @@ async function startServer() {
                 success: true,
                 message: 'Welcome to SanHerbs E-commerce API',
                 version: '1.0.0',
+                ssl_enabled: req.secure || req.header('x-forwarded-proto') === 'https',
                 website: 'https://sanherbs.com',
                 endpoints: {
                     auth: '/api/auth',
@@ -161,12 +195,12 @@ async function startServer() {
             });
         });
 
-        // 404 handler for API routes - FIXED
+        // 404 handler for API routes
         app.use('/api/*', (req, res) => {
             res.status(404).json({
                 success: false,
                 message: 'API endpoint not found',
-                requested_path: req.originalUrl,  // ✅ FIXED
+                requested_path: req.originalUrl,
                 available_endpoints: [
                     '/api/auth',
                     '/api/products', 
@@ -181,22 +215,21 @@ async function startServer() {
             });
         });
 
-        // ✅ ONLY redirect non-API requests (this MUST come LAST) - FIXED
+        // Redirect non-API requests to HTTPS frontend
         app.use('*', (req, res) => {
-            // Only redirect if it's NOT an API route
             if (!req.originalUrl.startsWith('/api/') && !req.originalUrl.startsWith('/auth/')) {
                 console.log(`Redirecting non-API request: ${req.originalUrl}`);
-                res.redirect('https://sanherbs.com');
+                res.redirect(301, 'https://sanherbs.com');
             } else {
                 res.status(404).json({
                     success: false,
                     message: 'Endpoint not found',
-                    requested_path: req.originalUrl  // ✅ FIXED
+                    requested_path: req.originalUrl
                 });
             }
         });
 
-        // Global error handler - FIXED
+        // Global error handler - Enhanced
         app.use((err, req, res, next) => {
             console.error('Global error handler:', err);
             
@@ -207,7 +240,7 @@ async function startServer() {
                 });
             }
             
-            if (err.code === 'LIMIT_FILE_SIZE') {  // ✅ FIXED
+            if (err.code === 'LIMIT_FILE_SIZE') {
                 return res.status(413).json({
                     success: false,
                     message: 'Request entity too large'
@@ -238,26 +271,28 @@ async function startServer() {
             res.status(err.status || 500).json({
                 success: false,
                 message: err.message || 'Internal server error',
-                ...(process.env.NODE_ENV === 'development' && { stack: err.stack })  // ✅ FIXED
+                ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
             });
         });
 
         // Start server
         const server = app.listen(PORT, () => {
-            console.log('🌿 SanHerbs E-commerce API Started');
-            console.log('━'.repeat(60));
-            console.log(`🚀 API Server running at: http://localhost:${PORT}`);
-            console.log(`📊 API endpoints at: http://localhost:${PORT}/api`);
-            console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
-            console.log(`🌐 Frontend website: https://sanherbs.com`);
-            console.log(`💳 Payment Gateway: ${process.env.RAZORPAY_KEY_ID ? 'Configured ✅' : 'Not Configured ❌'}`);
-            console.log(`📧 Email Service: ${process.env.EMAIL_USER ? 'Configured ✅' : 'Not Configured ❌'}`);
-            console.log(`📱 SMS Service: ${process.env.TWILIO_ACCOUNT_SID ? 'Configured ✅' : 'Not Configured ❌'}`);
-            console.log(`🚚 Shipping Service: ${process.env.SHIPROCKET_EMAIL ? 'Configured ✅' : 'Not Configured ❌'}`);
-            console.log('━'.repeat(60));
-            console.log('✅ Ready for API requests from sanherbs.com!');
-            console.log('🛒 Features: Cart → Checkout → Razorpay Payment → Tracking');
-            console.log('━'.repeat(60));
+            console.log('🔒 SanHerbs SECURE E-commerce API Started');
+            console.log('━'.repeat(70));
+            console.log(`🚀 API Server: http://localhost:${PORT}`);
+            console.log(`🔐 HTTPS Redirect: ENABLED`);
+            console.log(`📊 API Endpoints: http://localhost:${PORT}/api`);
+            console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
+            console.log(`🌐 Frontend: https://sanherbs.com`);
+            console.log(`🔑 JWT Secret: ${process.env.JWT_SECRET ? 'Configured ✅' : 'Missing ❌'}`);
+            console.log(`💳 Razorpay: ${process.env.RAZORPAY_KEY_ID ? 'Configured ✅' : 'Not Configured ❌'}`);
+            console.log(`📧 Email: ${process.env.EMAIL_USER ? 'Configured ✅' : 'Not Configured ❌'}`);
+            console.log(`📱 SMS: ${process.env.TWILIO_ACCOUNT_SID ? 'Configured ✅' : 'Not Configured ❌'}`);
+            console.log(`🚚 Shipping: ${process.env.SHIPROCKET_EMAIL ? 'Configured ✅' : 'Not Configured ❌'}`);
+            console.log('━'.repeat(70));
+            console.log('✅ READY: SSL/HTTPS + Security Headers + Rate Limiting');
+            console.log('🛒 Features: Cart → Checkout → Razorpay → Tracking');
+            console.log('━'.repeat(70));
         });
 
         // Graceful shutdown handlers
@@ -278,7 +313,7 @@ async function startServer() {
 
         process.on('SIGTERM', gracefulShutdown);
         process.on('SIGINT', gracefulShutdown);
-
+        
         process.on('uncaughtException', (err) => {
             console.error('Uncaught Exception:', err);
             process.exit(1);
@@ -292,6 +327,7 @@ async function startServer() {
         });
 
         return server;
+
     } catch (error) {
         console.error('❌ Server startup failed:', error);
         process.exit(1);
